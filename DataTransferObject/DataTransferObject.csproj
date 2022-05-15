@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{99BF8BC8-5493-479C-86FB-2A5BD3D3F5C1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DataTransferObject</RootNamespace>
+    <AssemblyName>DataTransferObject</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataTransferObject\ActionResult.cs" />
+    <Compile Include="DataTransferObject\AttemptInfo.cs" />
+    <Compile Include="DataTransferObject\AuthResult.cs" />
+    <Compile Include="DataTransferObject\CorrectAnswerInfo.cs" />
+    <Compile Include="DataTransferObject\CorrectAnswerOptionInfo.cs" />
+    <Compile Include="DataTransferObject\ErrorInfo.cs" />
+    <Compile Include="DataTransferObject\GetStartTestResult.cs" />
+    <Compile Include="DataTransferObject\GetTestsResult.cs" />
+    <Compile Include="DataTransferObject\PostQuestionResult.cs" />
+    <Compile Include="DataTransferObject\PostTestResult.cs" />
+    <Compile Include="DataTransferObject\PostUserAuth.cs" />
+    <Compile Include="DataTransferObject\PutAnswer.cs" />
+    <Compile Include="DataTransferObject\PutQuestion.cs" />
+    <Compile Include="DataTransferObject\QuestionEnums.cs" />
+    <Compile Include="DataTransferObject\QuestionInfo.cs" />
+    <Compile Include="DataTransferObject\ResultInfo.cs" />
+    <Compile Include="DataTransferObject\TestInfo.cs" />
+    <Compile Include="DataTransferObject\TestInfoSetter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

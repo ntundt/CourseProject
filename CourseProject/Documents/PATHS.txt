@@ -1,0 +1,15 @@
+-- user
+GET . . . . . . . api/user
+
+-- authentication
+GET, POST . . . . api/auth
+
+-- tests
+GET, POST . . . . api/tests
+GET, PUT  . . . . api/tests/[id]
+GET . . . . . . . api/tests/[id]/start
+GET . . . . . . . api/tests/[id]/end
+GET . . . . . . . api/tests/[id]/results
+GET, POST . . . . api/tests/[id]/questions
+PUT, DELETE . . . api/tests/[id]/questions/[id]
+GET, PUT  . . . . api/tests/[id]/questions/[id]/answer

@@ -1,0 +1,1 @@
+https://makolyte.com/csharp-map-query-results-to-multiple-objects-with-dapper/

@@ -1,0 +1,74 @@
+﻿<Page x:Class="CourseProjectClient.MVVM.View.LogIn"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:CourseProjectClient.MVVM.View"
+      xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:viewmodel="clr-namespace:CourseProjectClient.MVVM.ViewModel"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="LogIn">
+
+    <Page.DataContext>
+        <viewmodel:LogInViewModel/>
+    </Page.DataContext>
+
+    <Grid>
+        <wpfui:Card 
+            Width="300" 
+            VerticalAlignment="Center">
+            <StackPanel>
+                <TextBlock 
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Margin="5,5,5,0"
+                    Text="Логин"/>
+                <wpfui:TextBox 
+                    Margin="0,5,0,0"
+                    Text="{Binding Login}"/>
+                <TextBlock 
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    Margin="5,5,5,0"
+                    Text="Пароль"/>
+                <wpfui:TextBox
+                    Margin="0,5,0,0"
+                    FontFamily="pack://application:,,,/Resources/password.ttf#password"
+                    Text="{Binding Password}">
+                    <TextBox.InputBindings>
+                        <!--Disable CTRL+C (COPY) -->
+                        <KeyBinding Command="ApplicationCommands.NotACommand"
+                            Key="C"
+                            Modifiers="Control" />
+                        <!--Disable CTRL+X (CUT) -->
+                        <KeyBinding Command="ApplicationCommands.NotACommand"
+                            Key="X"
+                            Modifiers="Control" />
+                    </TextBox.InputBindings>
+                    <TextBox.ContextMenu>
+                        <!--Hide context menu where you could copy/cut as well -->
+                        <ContextMenu Visibility="Collapsed" />
+                    </TextBox.ContextMenu>
+                </wpfui:TextBox>
+                <Grid Margin="0,7,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="7"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <wpfui:Button
+                        Appearance="Secondary"
+                        Content="Еще нет аккаунта"
+                        Command="{Binding GoToSignUpCommand}"
+                        Cursor="Hand"/>
+
+                    <wpfui:Button
+                        Grid.Column="2"
+                        Appearance="Success"
+                        Content="Войти"
+                        Command="{Binding LogInCommand}"/>
+                </Grid>
+            </StackPanel>
+        </wpfui:Card>
+    </Grid>
+</Page>

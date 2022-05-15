@@ -1,0 +1,14 @@
+CREATE DATABASE COURSE_PROJECT ON PRIMARY (
+    NAME='CP_MAIN_MDF',
+    FILENAME='E:\Files\Лабы\ООП\CourseProject\CourseProject\CP_MAIN.MDF',
+    SIZE=10240KB,
+    MAXSIZE=UNLIMITED,
+    FILEGROWTH=1024KB
+)
+LOG ON (
+    NAME=N'CP_LOG',
+    FILENAME='E:\Files\Лабы\ООП\CourseProject\CourseProject\CP_MAIN.LDF',
+    SIZE=10240KB,
+    MAXSIZE=UNLIMITED,
+    FILEGROWTH=1024KB
+);

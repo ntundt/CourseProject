@@ -1,0 +1,121 @@
+﻿<Page x:Class="CourseProjectClient.MVVM.View.TestViewer"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:local="clr-namespace:CourseProjectClient.MVVM.View"
+      xmlns:viewmodel="clr-namespace:CourseProjectClient.MVVM.ViewModel"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="TestViewer">
+
+    <Page.DataContext>
+        <viewmodel:TestViewModel/>
+    </Page.DataContext>
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <ResourceDictionary x:Key="123">
+            <Style x:Name="EmptyStyle" x:Key="EmptyStyle"/>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="204"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <ScrollViewer Grid.Column="0"
+                      Padding="5"
+                      x:Name="sidebar">
+            <DockPanel VerticalAlignment="Stretch">
+                <StackPanel
+                    DockPanel.Dock="Top"
+                    VerticalAlignment="Stretch">
+                    <TextBlock 
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        Margin="5,5,5,0"
+                        Text="Осталось времени"
+                        Visibility="{Binding HasTimeLimit, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBlock 
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        Margin="5,5,5,0"
+                        FontSize="25"
+                        Text="{Binding TimeLeft}"
+                        Visibility="{Binding HasTimeLimit, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBlock
+                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                        Margin="5,5,5,0"
+                        Text="Вопросы"/>
+                    
+                    <ListBox 
+                        BorderBrush="Transparent"
+                        Background="Transparent"
+                        Padding="0"
+                        SelectedItem="{Binding SelectedQuestion}"
+                        ItemsSource="{Binding Questions}">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel 
+                                    Margin="0,0,0,0"
+                                    MaxWidth="200"
+                                    MouseWheel="WrapPanel_MouseWheel"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <wpfui:Button
+                                    Width="30"
+                                    Margin="3,0,0,0"
+                                    Content="{Binding Index}" 
+                                    Cursor="Hand"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+                <wpfui:Button
+                    DockPanel.Dock="Bottom"
+                    VerticalAlignment="Bottom"
+                    Margin="5"
+                    Appearance="Success"
+                    Content="Завершить попытку" Cursor="Hand"/>
+            </DockPanel>
+        </ScrollViewer>
+
+        <ScrollViewer 
+            Grid.Column="1"
+            Padding="10">
+            <StackPanel>
+                <TextBlock
+                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    FontSize="18"
+                    TextWrapping="Wrap"
+                    Text="{Binding SelectedQuestion.Text}"/>
+                <StackPanel Margin="0,5,0,0">
+                    <ListView 
+                        ItemsSource="{Binding SelectedQuestion.AnswerOptions}"
+                        Visibility="{Binding RadioButtonsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <RadioButton GroupName="QuestionAnswers" IsChecked="{Binding IsChecked}" Content="{Binding Text}"/>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <ListView
+                        ItemsSource="{Binding SelectedQuestion.AnswerOptions}"
+                        Visibility="{Binding CheckboxesVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Margin="0,5,0,0" IsChecked="{Binding IsChecked}" Content="{Binding Text}"/>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+    </Grid>
+</Page>

@@ -1,0 +1,70 @@
+// Code for dbdiagram.io
+
+enum question_type {
+  single_choise
+  multiple_choise
+  string
+}
+
+enum check_algorithm {
+  exact_match
+  partial_match
+  proportional_match
+}
+
+Table user {
+  id int [pk]
+  name nvarchar(64)
+  date_created timestamp
+  login varchar(64)
+  password_sha256 char(64)
+}
+
+Table test {
+  id int [pk]
+  author_id int
+  date_created timestamp
+  public_until timestamp
+  private_until timestamp
+}
+
+Table question {
+  id int [pk]
+  author_id int
+  question nvarchar(1024)
+  type question_type
+  check check_algorithm
+}
+
+Table access_token {
+  token char(64) [pk]
+  user_id int
+}
+
+Table answer {
+  id int [pk]
+  question_id int
+  answer nvarchar(64)
+  correct boolean
+}
+
+Table user_answer {
+  ongoing_test_id int [pk]
+  answer_id int
+}
+
+Table ongoing_test {
+  id int [pk]
+  user_id int
+  test_id int
+  start timestamp
+}
+
+Ref: test.author_id > user.id
+Ref: question.author_id > user.id
+Ref: access_token.user_id > user.id
+Ref: answer.question_id > question.id
+Ref: user_answer.ongoing_test_id > ongoing_test.id
+Ref: user_answer.answer_id > answer.id
+Ref: ongoing_test.user_id > user.id
+Ref: ongoing_test.test_id > test.id

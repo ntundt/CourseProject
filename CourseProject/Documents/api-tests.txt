@@ -1,0 +1,18 @@
+curl -X POST -H "Content-type: application/json" -d "{\"name\":\"Mikita Tsikhanovich\"}" https://localhost:7252/api/auth
+
+curl -X GET -H "Authorization: bffade87e2e8e7383387b5f32368dffb5ed36e5d39b292b2e55fa82cd2d83fe" https://localhost:7252/api/tests
+
+curl -X POST -H "Authorization: bffade87e2e8e7383387b5f32368dffb5ed36e5d39b292b2e55fa82cd2d83fe" https://localhost:7252/api/tests
+
+curl -X GET -H "Authorization: bffade87e2e8e7383387b5f32368dffb5ed36e5d39b292b2e55fa82cd2d83fe" https://localhost:7252/api/tests/7
+
+curl -X PUT -H "Authorization: bffade87e2e8e7383387b5f32368dffb5ed36e5d39b292b2e55fa82cd2d83fe" -H "Content-type: application/json" -d "{\"resultsPublic\":true}" https://localhost:7252/api/tests/7
+
+curl -X GET -H "Authorization: bffade87e2e8e7383387b5f32368dffb5ed36e5d39b292b2e55fa82cd2d83fe" https://localhost:7252/api/tests/7/start
+
+curl -X PUT -H "Authorization: bffade87e2e8e7383387b5f32368dffb5ed36e5d39b292b2e55fa82cd2d83fe" -H "Content-type: application/json" -d "{\"selectedOptions\":[2,3]}" https://localhost:7252/api/attempts/1/questions/1/answer
+
+curl -X PUT -H "Authorization: bffade87e2e8e7383387b5f32368dffb5ed36e5d39b292b2e55fa82cd2d83fe" -H "Content-type: application/json" -d "{\"index\":1,\"questionType\":0,\"text\":\"33 + 77 = ?\",\"checkAlgorithm\":0,\"answerOptions\":[{\"answerId\":0,\"text\":\"100\",\"checked\":true},{\"answerId\":0,\"text\":\"110\",\"checked\":false},{\"answerId\":0,\"text\":\"115\",\"checked\":false}]}" https://localhost:7252/api/tests/7/questions/3
+
+curl -X GET -H "Authorization: bffade87e2e8e7383387b5f32368dffb5ed36e5d39b292b2e55fa82cd2d83fe" https://localhost:7252/api/attempts/1/results
+
