@@ -82,6 +82,7 @@
     </ApplicationDefinition>
     <Compile Include="Converters\LongToTimeSpanConverter.cs" />
     <Compile Include="Exceptions\DefaultException.cs" />
+    <Compile Include="MVVM\Command\StartTestAttemptCommand.cs" />
     <Compile Include="MVVM\Model\Attempt.cs" />
     <Compile Include="MVVM\Model\Question.cs" />
     <Compile Include="MVVM\Model\Test.cs" />
@@ -90,13 +91,21 @@
     <Compile Include="MVVM\ViewModel\INavigationRequester.cs" />
     <Compile Include="MVVM\ViewModel\LogInViewModel.cs" />
     <Compile Include="MVVM\ViewModel\MainWindow.cs" />
+    <Compile Include="MVVM\ViewModel\MyTestsViewModel.cs" />
     <Compile Include="MVVM\ViewModel\NavigationMediator.cs" />
+    <Compile Include="MVVM\ViewModel\PassedTestsViewModel.cs" />
     <Compile Include="MVVM\ViewModel\SignUpViewModel.cs" />
     <Compile Include="MVVM\ViewModel\TestEditViewModel.cs" />
     <Compile Include="MVVM\ViewModel\TestListViewModel.cs" />
     <Compile Include="MVVM\ViewModel\TestViewModel.cs" />
     <Compile Include="MVVM\View\LogIn.xaml.cs">
       <DependentUpon>LogIn.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MVVM\View\MyTestsView.xaml.cs">
+      <DependentUpon>MyTestsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MVVM\View\PassedTestsView.xaml.cs">
+      <DependentUpon>PassedTestsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="MVVM\View\SignUp.xaml.cs">
       <DependentUpon>SignUp.xaml</DependentUpon>
@@ -122,6 +131,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MVVM\View\MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MVVM\View\MyTestsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MVVM\View\PassedTestsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

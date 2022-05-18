@@ -8,7 +8,7 @@ using AccessViolationException = CourseProjectServer.Exceptions.AccessViolationE
 
 namespace CourseProjectServer.Controllers
 {
-    [Route("api/attempts/{testAttemptId}")]
+    [Route("api/attempts")]
     [ApiController]
     public class AttemptController : ControllerBase
     {
@@ -20,7 +20,22 @@ namespace CourseProjectServer.Controllers
             userDao = new(config);
         }
 
-        [Route("end")]
+        [HttpGet]
+        public List<AttemptInfo> GetAttempts()
+        {
+            User user = userDao.GetByAccessToken(Request.Headers.Authorization);
+            List<TestAttempt> testAttempts = attemptDao.GetByUserId(user.UserId);
+
+            return testAttempts.Select(x => new AttemptInfo() {
+                AttemptId = x.AttemptId,
+                TestId = x.Test.TestId,
+                UserId = x.Testee.UserId,
+                Started = ((DateTimeOffset)x.Started).ToUnixTimeSeconds(),
+                Ended = ((DateTimeOffset)(x.Ended < new DateTime(1970, 1, 1) ? new DateTime(1970, 1, 1) : x.Ended)).ToUnixTimeSeconds()
+            }).ToList();
+        }
+
+        [Route("{testAttemptId}/end")]
         [HttpGet]
         public AttemptInfo GetAttempt([FromRoute] int testAttemptId)
         {

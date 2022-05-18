@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="CourseProjectClient.MVVM.View.MyTestsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CourseProjectClient.MVVM.View"
+             xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:viewmodel="clr-namespace:CourseProjectClient.MVVM.ViewModel"
+             xmlns:uc="clr-namespace:CourseProjectClient.MVVM.UserContols"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.DataContext>
+        <viewmodel:MyTestsViewModel/>
+    </UserControl.DataContext>
+    
+    <StackPanel
+        MinHeight="{Binding ActualHeight, ElementName=ScrollView}">
+
+        <Button
+            Width="125"
+            Margin="0,5,0,5"
+            Content="Создать" Cursor="Hand"/>
+
+
+        <ListBox 
+            Name="MyTestsList" 
+            Margin="0,0,0,0"
+            BorderThickness="0"
+            Padding="0"
+            Background="Transparent"
+            ItemsSource="{Binding PassedTests}">
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter 
+                        Property="IsSelected" 
+                        Value="{Binding Content.IsSelected, Mode=TwoWay, RelativeSource={RelativeSource Self}}"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel 
+                        x:Name="stackPanel"
+                        HorizontalAlignment="Center" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <uc:TestCard 
+                        Text="{Binding Id}"
+                        QuestionCount="{Binding Id}"
+                        TimeLimit="{Binding TimeLimit, Converter={StaticResource ltts}}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+        </ListBox>
+    </StackPanel>
+</UserControl>

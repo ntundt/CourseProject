@@ -141,12 +141,12 @@ namespace CourseProjectServer.Repositories
         public int GetUsedAttemptCount(int testId, int userId) {
             var queryString =
                 $"SELECT " +
-                $"    COUNT(*) C" +
+                $"    COUNT(*) C " +
                 $"FROM " +
                 $"    ONGOING_TEST " +
                 $"WHERE " +
                 $"    ONGOING_TEST.TEST_ID = @test_id " +
-                $"    AND ONGOING_TEST.USER_ID = @user_id";
+                $"    AND ONGOING_TEST.RESPONDENT_USER_ID = @user_id";
 
             using SqlConnection connection = new(_config.GetConnectionString("MsSql"));
             connection.Open();
@@ -306,6 +306,100 @@ namespace CourseProjectServer.Repositories
             {
                 throw new AttemptNotFoundException(attempt.AttemptId);
             }
+        }
+
+        public List<TestAttempt> GetByUserId(int userId)
+        {
+            var queryString =
+                $"SELECT " +
+                $"  ONGOING_TEST.ID OID, " +
+                $"  ONGOING_TEST.TEST_ID OTEST_ID, " +
+                $"  ONGOING_TEST.RESPONDENT_USER_ID ORESPONDENT_USER_ID, " +
+                $"  ONGOING_TEST.[STARTED] OSTARTED, " +
+                $"  ONGOING_TEST.ENDED OENDED, " +
+
+                $"  TEST.ID TID, " +
+                $"  TEST.AUTHOR_USER_ID TAUTHOR_USER_ID, " +
+                $"  TEST.DATE_CREATED TDATE_CREATED, " +
+                $"  TEST.RESULTS_PUBLIC TRESULTS_PUBLIC, " +
+                $"  TEST.CAN_NOT_REVIEW_QUESTION TCAN_NOT_REVIEW_QUESTION, " +
+                $"  TEST.ATTEMPTS TATTEMPTS, " +
+                $"  TEST.TIME_LIMIT TTIME_LIMIT, " +
+                $"  TEST.PUBLIC_UNTIL TPUBLIC_UNTIL, " +
+                $"  TEST.PRIVATE_UNTIL TPRIVATE_UNTIL, " +
+                $"  TEST.RESULTS_PUBLIC TRESULTS_PUBLIC, " +
+
+                $"  [USER].ID UID, " +
+                $"  [USER].NAME UNAME, " +
+                $"  [USER].DATE_CREATED UDATE_CREATED, " +
+                $"  [USER].LOGIN ULOGIN, " +
+                $"  [USER].PASSWORD_SHA256 UPASSWORD_SHA256 " +
+                
+                $"FROM " +
+                $"  ONGOING_TEST " +
+                $"  JOIN TEST ON TEST.ID = ONGOING_TEST.TEST_ID " +
+                $"  JOIN [USER] ON [USER].ID = ONGOING_TEST.RESPONDENT_USER_ID " +
+                $"WHERE " +
+                $"  ONGOING_TEST.RESPONDENT_USER_ID = @user_id";
+
+            using SqlConnection connection = new(_config.GetConnectionString("MsSql"));
+            connection.Open();
+            SqlCommand command = new(queryString, connection);
+
+            SqlParameter user_id = new("@user_id", SqlDbType.Int);
+            user_id.Value = userId;
+            command.Parameters.Add(user_id);
+
+            command.Prepare();
+            SqlDataReader reader = command.ExecuteReader();
+
+            reader.Read();
+
+            if (!reader.HasRows)
+            {
+                return new List<TestAttempt>();
+            }
+            
+            User testee = new User 
+            {
+                UserId = reader.GetFieldValue<int>("UID"),
+                Name = reader.GetFieldValue<string>("UNAME"),
+                CreatedDate = reader.GetFieldValue<DateTime>("UDATE_CREATED"),
+                Login = reader.GetFieldValue<string>("ULOGIN"),
+                PasswordHash = reader.GetFieldValue<string?>("UPASSWORD_SHA256")
+            };
+
+            List<TestAttempt> attempts = new();
+            do
+            {
+                TestAttempt attempt = attempts.FirstOrDefault(x => x.AttemptId == reader.GetFieldValue<int>("OID"), new TestAttempt {
+                    AttemptId = reader.GetFieldValue<int>("OID"),
+                    Test = new Test
+                    {
+                        TestId = reader.GetFieldValue<int>("OTEST_ID"),
+                        Author = new User
+                        {
+                            UserId = reader.GetFieldValue<int>("TAUTHOR_USER_ID")
+                        },
+                        CreatedDate = reader.GetFieldValue<DateTime>("TDATE_CREATED"),
+                        ResultsPublic = reader.GetFieldValue<bool>("TRESULTS_PUBLIC"),
+                        CanNotReviewQuestion = reader.GetFieldValue<bool>("TCAN_NOT_REVIEW_QUESTION"),
+                        Attempts = reader.GetFieldValue<int>("TATTEMPTS"),
+                        TimeLimit = reader.GetFieldValue<TimeSpan>("TTIME_LIMIT"),
+                        PublicUntil = reader.GetFieldValue<DateTime>("TPUBLIC_UNTIL"),
+                        PrivateUntil = reader.GetFieldValue<DateTime>("TPRIVATE_UNTIL")
+                    },
+                    Testee = testee,
+                    Started = reader.GetFieldValue<DateTime>("OSTARTED"),
+                    Ended = reader.GetFieldValue<DateTime>("OENDED")
+                });
+                if (!attempts.Contains(attempt))
+                {
+                    attempts.Add(attempt);
+                }
+            } while (reader.Read());
+
+            return attempts;
         }
     }
 }

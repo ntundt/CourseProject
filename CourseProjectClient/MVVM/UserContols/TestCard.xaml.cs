@@ -66,7 +66,7 @@ namespace CourseProjectClient.MVVM.UserContols
             {
                 return $"{Math.Floor(timeSpan.TotalHours)} ч {Math.Floor(timeSpan.TotalMinutes)} мин";
             }
-            return $"{Math.Floor(timeSpan.TotalHours)} ч {Math.Floor(timeSpan.TotalMinutes)} мин";
+            return $"{Math.Floor(timeSpan.TotalMinutes)} мин";
         }
 
         private static string Format(int questionCount)

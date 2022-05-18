@@ -1,4 +1,8 @@
-﻿using DataTransferObject;
+﻿using CourseProjectClient.Exceptions;
+using CourseProjectClient.MVVM.Model;
+using CourseProjectClient.MVVM.View;
+using CourseProjectClient.Services;
+using DataTransferObject;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,32 +13,60 @@ using System.Threading.Tasks;
 
 namespace CourseProjectClient.MVVM.ViewModel
 {
+    public enum PageSelected
+    {
+        Passed,
+        My
+    }
+
     class TestListViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        private ObservableCollection<TestInfo> _tests;
-        public ObservableCollection<TestInfo> Tests
+        private PageSelected _selectedPage = PageSelected.Passed;
+        public PageSelected SelectedPage
         {
-            get => _tests;
+            get => _selectedPage;
             set
             {
-                _tests = value;
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(Tests)));
+                _selectedPage = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(SelectedPage)));
+                if (_selectedPage == PageSelected.My)
+                {
+                    CurrentViewModel = new MyTestsViewModel();
+                }
+                if (_selectedPage == PageSelected.Passed)
+                {
+                    CurrentViewModel = new PassedTestsViewModel();
+                }
+            }
+        }
+
+        private object _currentViewModel;
+        public object CurrentViewModel
+        {
+            get => _currentViewModel;
+            set
+            {
+                _currentViewModel = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(CurrentViewModel)));
             }
         }
 
         public TestListViewModel()
         {
-            _tests = new ObservableCollection<TestInfo>()
+            SelectedPage = PageSelected.Passed;
+
+            /*_myTests = new ObservableCollection<Test>()
             {
-                new TestInfo()
+                new Test()
                 {
-                    Id=1,
-                    AuthorId=12,
-                    TimeLimit=3600
+                    Id = 1,
+                    AuthorId = 12,
+                    TimeLimit = new TimeSpan(1, 0, 0)
                 }
-            };
+            };*/
+
         }
     }
 }

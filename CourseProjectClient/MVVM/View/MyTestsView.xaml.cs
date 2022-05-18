@@ -1,6 +1,4 @@
-﻿using CourseProjectClient.MVVM.Model;
-using CourseProjectClient.MVVM.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,19 +16,13 @@ using System.Windows.Shapes;
 namespace CourseProjectClient.MVVM.View
 {
     /// <summary>
-    /// Логика взаимодействия для TestViewer.xaml
+    /// Логика взаимодействия для MyTestsView.xaml
     /// </summary>
-    public partial class TestViewer : Page
+    public partial class MyTestsView : UserControl
     {
-        public TestViewer(Attempt attempt)
+        public MyTestsView()
         {
             InitializeComponent();
-            DataContext = new TestViewModel(attempt);
-        }
-
-        private void WrapPanel_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            sidebar.ScrollToVerticalOffset(sidebar.VerticalOffset - e.Delta);
         }
     }
 }

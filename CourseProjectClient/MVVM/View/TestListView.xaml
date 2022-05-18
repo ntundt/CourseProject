@@ -17,7 +17,11 @@
     </Page.DataContext>
 
     <Page.Resources>
+
         <converters:LongToTimeSpanConverter x:Key="ltts" />
+        
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
         <Style x:Key="ListBoxContainerStyle">
             <Style.Resources>
                 <SolidColorBrush 
@@ -26,6 +30,14 @@
                     Opacity="0" />
             </Style.Resources>
         </Style>
+
+        <Style 
+            x:Key="Bruh" 
+            TargetType="{x:Type RadioButton}" 
+            BasedOn="{StaticResource {x:Type ToggleButton}}">
+            
+        </Style>
+
     </Page.Resources>
     
     <Grid>
@@ -36,7 +48,26 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
-            
+            <StackPanel 
+                Orientation="Horizontal" 
+                HorizontalAlignment="Center">
+                <StackPanel.Resources>
+                    <viewmodel:ComparisonConverter x:Key="ComparisonConverter" />
+                </StackPanel.Resources>
+                <RadioButton 
+                    x:Name="PassedButton" 
+                    Cursor="Hand" 
+                    Style="{StaticResource Bruh}"
+                    IsChecked="{Binding Path=SelectedPage, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static viewmodel:PageSelected.Passed}}"
+                    Content="Пройденные"
+                    Margin="0,0,5,0"/>
+                <RadioButton 
+                    x:Name="MyButton"
+                    Cursor="Hand"
+                    Style="{StaticResource Bruh}"
+                    IsChecked="{Binding Path=SelectedPage, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static viewmodel:PageSelected.My}}"
+                    Content="Мои"/>
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="1">
@@ -48,46 +79,186 @@
             </Grid.ColumnDefinitions>
 
             <ScrollViewer 
-                MaxWidth="{Binding ActualWidth, ElementName=MainContent}" 
+                MaxWidth="{Binding ActualWidth, ElementName=MainContent}"
+                x:Name="ScrollView"
                 Grid.Column="1">
 
-                <ListBox 
-                    Name="SomeList" 
-                    Margin="0,0,0,0"
-                    ItemsSource="{Binding Tests}" >
-
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="IsSelected" Value="{Binding Content.IsSelected, Mode=TwoWay, RelativeSource={RelativeSource Self}}"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListBoxItem">
-                                        <ContentPresenter/>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel 
-                                x:Name="stackPanel" 
-                                HorizontalAlignment="Center" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <uc:TestCard 
-                                Text="{Binding Id}"
-                                QuestionCount="{Binding Id}"
-                                TimeLimit="{Binding TimeLimit, Converter={StaticResource ltts}}"/>
+                <ContentControl Content="{Binding CurrentViewModel}">
+                    <ContentControl.Resources>
+                        <DataTemplate DataType="{x:Type viewmodel:MyTestsViewModel}">
+                            <local:MyTestsView/>
                         </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    
-                </ListBox>
-                
+                        <DataTemplate DataType="{x:Type viewmodel:PassedTestsViewModel}">
+                            <local:PassedTestsView/>
+                        </DataTemplate>
+                    </ContentControl.Resources>
+                </ContentControl>
+
+                <!--<StackPanel
+                    MinHeight="{Binding ActualHeight, ElementName=ScrollView}">
+
+                    <StackPanel 
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal"
+                        Margin="0,5,0,5"
+                        Visibility="{Binding MyTestsVisible,Converter={StaticResource BoolToVis}}">
+                        <wpfui:TextBox
+                            Width="125"
+                            Margin="0,0,5,0"
+                            Placeholder="ID теста"/>
+                        <wpfui:Button
+                            Content="Начать"
+                            Height="35"/>
+                    </StackPanel>
+
+                    <ListBox 
+                        Name="MyTestsList" 
+                        Margin="0,0,0,0"
+                        BorderThickness="0"
+                        Padding="0"
+                        Background="Transparent"
+                        Visibility="{Binding PassedTestsVisible, Converter={StaticResource BoolToVis}}"
+                        ItemsSource="{Binding PassedTests}">
+
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter 
+                                    Property="IsSelected" 
+                                    Value="{Binding Content.IsSelected, Mode=TwoWay, RelativeSource={RelativeSource Self}}"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <ContentPresenter/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel 
+                                    x:Name="stackPanel"
+                                    HorizontalAlignment="Center" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <uc:TestCard 
+                                    Text="{Binding Id}"
+                                    QuestionCount="{Binding Id}"
+                                    TimeLimit="{Binding TimeLimit, Converter={StaticResource ltts}}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+
+                    </ListBox>
+
+                    <Button
+                        Width="125"
+                        Margin="0,5,0,5"
+                        Visibility="{Binding PassedTestsVisible, Converter={StaticResource BoolToVis}}"
+                        Content="Создать"/>
+
+                    <ListBox 
+                        Name="PassedTestsList" 
+                        Margin="0,0,0,0"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Visibility="{Binding MyTestsVisible,Converter={StaticResource BoolToVis}}"
+                        ItemsSource="{Binding MyTests}" >
+
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter 
+                                    Property="IsSelected" 
+                                    Value="{Binding Content.IsSelected, Mode=TwoWay, RelativeSource={RelativeSource Self}}"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <ContentPresenter/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel 
+                                    x:Name="stackPanel" 
+                                    HorizontalAlignment="Center" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <wpfui:Card>
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition MinHeight="35"/>
+                                            <RowDefinition Height="1*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock 
+                                            Grid.Column="0" 
+                                            Grid.Row="0"
+                                            FontSize="18"
+                                            Foreground="AntiqueWhite"
+                                            Text="{Binding Id}"
+                                            x:Name="Title"/>
+
+                                        <Grid Grid.Column="0" Grid.Row="1">
+
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="1*"/>
+                                                <ColumnDefinition Width="200"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center">
+
+                                                <wpfui:SymbolIcon
+                                                    Visibility="{Binding QuestionCountLabelVisible, Converter={StaticResource BoolToVis}}"
+                                                    Symbol="CheckboxChecked20"/>
+
+                                                <Label
+                                                    Margin="0,3,7,0"
+                                                    Foreground="AntiqueWhite"
+                                                    x:Name="QuestionCountLabel"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="{Binding QuestionCountLabelVisible, Converter={StaticResource BoolToVis}}"
+                                                    Content="{Binding TimeLimit, StringFormat=hh\\ ч\\ mm\\ мин}"/>
+
+                                                <wpfui:SymbolIcon 
+                                                    Visibility="{Binding TimeLimitLabelVisible, Converter={StaticResource BoolToVis}}"
+                                                    Symbol="Clock20"/>
+
+                                                <Label
+                                                    Margin="1,3,7,0"
+                                                    Foreground="AntiqueWhite"
+                                                    x:Name="TimeLimitLabel"
+                                                    Visibility="{Binding TimeLimitLabelVisible, Converter={StaticResource BoolToVis}}"
+                                                    Content="{Binding TimeLimitFormatted}"/>
+
+                                            </StackPanel>
+
+                                            <wpfui:Button 
+                                                Grid.Column="1" Grid.Row="0"
+                                                Height="35"
+                                                Command="{Binding SeeResults}"
+                                                Content="Результаты"/>
+
+                                        </Grid>
+                                    </Grid>
+                                </wpfui:Card>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+
+                    </ListBox>
+                </StackPanel>-->
+
             </ScrollViewer>
 
         </Grid>

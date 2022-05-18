@@ -16,7 +16,9 @@
     </UserControl.Resources>
     
     <wpfui:Card 
-        DataContext="{Binding ElementName=tc}">
+        DataContext="{Binding ElementName=tc}"
+        MinHeight="100"
+        MinWidth="500">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition MinHeight="35"/>

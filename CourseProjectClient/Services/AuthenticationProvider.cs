@@ -70,7 +70,7 @@ namespace CourseProjectClient.Services
         {
             _accessToken = authResult.AccessToken;
             _name = authResult.Name;
-            _created = DateTimeOffset.FromUnixTimeMilliseconds(authResult.CreatedDate).DateTime;
+            _created = DateTimeOffset.FromUnixTimeSeconds(authResult.CreatedDate).DateTime;
             _loggedIn = DateTime.Now;
             SaveToFile();
         }

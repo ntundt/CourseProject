@@ -1,4 +1,6 @@
-﻿using CourseProjectClient.MVVM.Model;
+﻿using CourseProjectClient.Exceptions;
+using CourseProjectClient.MVVM.Model;
+using CourseProjectClient.Services;
 using DataTransferObject;
 using System;
 using System.Collections.Generic;
@@ -7,12 +9,17 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using WPFUI.Common;
 
 namespace CourseProjectClient.MVVM.ViewModel
 {
     internal class TestViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        public ICommand SaveAnswer { get; set; }
+        public ICommand EndAttempt { get; set; }
 
         private Attempt _attempt;
         public Attempt Attempt
@@ -76,43 +83,59 @@ namespace CourseProjectClient.MVVM.ViewModel
             get => _selectedQuestion.QuestionType == QuestionType.StringInput;
         }
 
-        public TestViewModel()
+        private void RetrieveQuestions()
         {
-            _selectedQuestion = new Question()
-            {
-                Id = 1,
-                Text = "what is obamas last name",
-                Index = 1,
-                QuestionType = QuestionType.MultipleChoise,
-                AnswerOptions = new ObservableCollection<AnswerOption>()
+            var questionsInfo = Task.Run<List<QuestionInfo>>(async () => await CommunicationService.GetAttemptQuestions(_attempt.Id)).Result;
+
+            ObservableCollection<Question> questions = new ObservableCollection<Question>(
+                questionsInfo.Select(info => new Question
                 {
-                    new AnswerOption()
+                    Id = info.QuestionId,
+                    Text = info.Text,
+                    Index = info.Index,
+                    QuestionType = info.QuestionType,
+                    CheckAlgorithm = info.CheckAlgorithm,
+                    AnswerOptions = new ObservableCollection<AnswerOption>(info.AnswerOptions.Select(x => new AnswerOption
                     {
-                        Id = 1,
-                        Text = "barack",
-                        IsChecked = true
-                    },
-                    new AnswerOption()
-                    {
-                        Id = 1,
-                        Text = "oabma"
-                    }
+                        Id = x.AnswerId,
+                        Text = x.Text,
+                        IsChecked = x.Checked ?? false
+                    }).ToList())
+                }).ToList()
+            );
+
+            Questions = questions;
+
+            SelectedQuestion = questions[0];
+        }
+
+        public TestViewModel(Attempt attempt)
+        {
+            _attempt = attempt;
+
+            RetrieveQuestions();
+
+            SaveAnswer = new RelayCommand(() =>
+            {
+                try
+                {
+                    Task.Run(async () => await CommunicationService.SaveAnswer(_attempt.Id, SelectedQuestion));
+                } catch (DefaultException e)
+                {
+                    e.ShowSnackBar();
                 }
-            };
+            });
 
-            _attempt = new Attempt
+            EndAttempt = new RelayCommand(() =>
             {
-                Id = 2,
-                TestId = 1,
-                UserId = 2,
-                Started = DateTime.Now,
-                Ended = DateTime.Now + new TimeSpan(1,0,0)
-            };
-
-            _questions = new ObservableCollection<Question>()
-            {
-               _selectedQuestion
-            };
+                try
+                {
+                    Task.Run(async () => await CommunicationService.EndTest(_attempt.Id));
+                } catch (DefaultException e)
+                {
+                    e.ShowSnackBar();
+                }
+            });
         }
     }
 }

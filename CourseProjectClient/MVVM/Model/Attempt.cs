@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CourseProjectClient.MVVM.Model
 {
-    internal class Attempt : INotifyPropertyChanged
+    public class Attempt : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         private int _id;
@@ -46,5 +46,10 @@ namespace CourseProjectClient.MVVM.Model
         public int? MaxMark { get; set; }
         public DateTime Started { get; set; }
         public DateTime? Ended { get; set; }
+
+        public bool HasEnded
+        {
+            get => (Ended ?? Started) > Started;
+        }
     }
 }
