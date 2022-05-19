@@ -20,8 +20,8 @@
         <Button
             Width="125"
             Margin="0,5,0,5"
-            Content="Создать" Cursor="Hand"/>
-
+            Content="Создать" Cursor="Hand"
+            Command="{Binding CreateTest}"/>
 
         <ListBox 
             Name="MyTestsList" 

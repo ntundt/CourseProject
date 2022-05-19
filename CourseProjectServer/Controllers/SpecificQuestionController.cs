@@ -22,6 +22,20 @@ namespace CourseProjectServer.Controllers
             userDao = new(config);
         }
 
+        [HttpDelete]
+        public void DeleteQuestion([FromRoute] int testId, [FromRoute] int questionId)
+        {
+            User user = userDao.GetByAccessToken(Request.Headers.Authorization);
+            Test test = testDao.GetTestById(testId);
+
+            if (user.UserId != test.Author.UserId)
+            {
+                throw new AccessViolationException();
+            }
+
+            questionDao.DeleteById(questionId);
+        }
+
         [HttpPut]
         public void PutQuestion([FromRoute] int testId, [FromRoute] int questionId, [FromBody] PutQuestion question)
         {

@@ -56,17 +56,6 @@ namespace CourseProjectClient.MVVM.ViewModel
         public TestListViewModel()
         {
             SelectedPage = PageSelected.Passed;
-
-            /*_myTests = new ObservableCollection<Test>()
-            {
-                new Test()
-                {
-                    Id = 1,
-                    AuthorId = 12,
-                    TimeLimit = new TimeSpan(1, 0, 0)
-                }
-            };*/
-
         }
     }
 }

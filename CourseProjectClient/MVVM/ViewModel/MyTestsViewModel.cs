@@ -9,12 +9,16 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using WPFUI.Common;
 
 namespace CourseProjectClient.MVVM.ViewModel
 {
     internal class MyTestsViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        public ICommand CreateTest { get; set; }
 
         private ObservableCollection<Test> _myTests;
         public ObservableCollection<Test> MyTests
@@ -44,15 +48,32 @@ namespace CourseProjectClient.MVVM.ViewModel
                     Attempts = x.Attempts
                 }));
             }
-            catch (DefaultException e)
+            catch (AggregateException e) when (e.InnerException is DefaultException)
             {
-                e.ShowSnackBar();
+                (e.InnerException as DefaultException).ShowSnackBar();
             }
         }
 
         public MyTestsViewModel()
         {
             RetrieveMyTests();
+
+            CreateTest = new RelayCommand(() =>
+            {
+                try {
+                    var result = Task.Run<PostTestResult>(async () => await CommunicationService.CreateTest(new TestInfoSetter { })).Result;
+
+                    var testvm = new TestEditViewModel();
+
+                    testvm.SetTestId(result.TestId);
+
+                    NavigationMediator.SetRootViewModel(testvm);
+                }
+                catch (AggregateException e) when (e.InnerException is DefaultException)
+                {
+                    (e.InnerException as DefaultException).ShowSnackBar();
+                }
+            });
         }
     }
 }

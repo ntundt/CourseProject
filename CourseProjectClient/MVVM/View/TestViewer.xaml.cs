@@ -20,12 +20,12 @@ namespace CourseProjectClient.MVVM.View
     /// <summary>
     /// Логика взаимодействия для TestViewer.xaml
     /// </summary>
-    public partial class TestViewer : Page
+    public partial class TestViewer : UserControl
     {
-        public TestViewer(Attempt attempt)
+        public TestViewer()
         {
+            //DataContext = new TestViewModel(attempt);
             InitializeComponent();
-            DataContext = new TestViewModel(attempt);
         }
 
         private void WrapPanel_MouseWheel(object sender, MouseWheelEventArgs e)

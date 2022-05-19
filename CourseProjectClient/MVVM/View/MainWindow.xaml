@@ -11,6 +11,7 @@
         Height="450" Width="800"
         MinHeight="450" MinWidth="800"
         xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+        x:Name="RootWindow"
         Style="{StaticResource UiWindow}">
     <Grid>
         <Grid.RowDefinitions>
@@ -26,12 +27,45 @@
             </wpfui:TitleBar.Tray>
         </wpfui:TitleBar>
 
-        <Frame
+        <ContentControl 
+            Grid.Row="1"
+            Grid.Column="0"
+            Content="{Binding CurrentViewModel}">
+            <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type viewmodel:TestViewModel}">
+                    <local:TestViewer DataContext="{Binding DataContext.CurrentViewModel, ElementName=RootWindow}"/>
+                    <!--<Frame DataContext="{Binding CurrentViewModel}" Source="../View/TestViewer.xaml"/>-->
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:TestListViewModel}">
+                    <Frame 
+                        DataContext="{Binding DataContext.CurrentViewModel, ElementName=RootWindow}" 
+                        Source="../View/TestListView.xaml"/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:SignUpViewModel}">
+                    <Frame 
+                        DataContext="{Binding DataContext.CurrentViewModel, ElementName=RootWindow}"
+                        Source="../View/SignUp.xaml"/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:LogInViewModel}">
+                    <Frame
+                        DataContext="{Binding DataContext.CurrentViewModel, ElementName=RootWindow}"
+                        Source="../View/LogIn.xaml"/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:TestEditViewModel}">
+                    <local:TestEditor DataContext="{Binding DataContext.CurrentViewModel, ElementName=RootWindow}"/>
+                    <!--<Frame
+                        DataContext="{Binding DataContext.CurrentViewModel, ElementName=RootWindow}"
+                        Source="../View/TestEditor.xaml"/>-->
+                </DataTemplate>
+            </ContentControl.Resources>
+        </ContentControl>
+
+        <!--<Frame
             x:Name="Frame"
             NavigationUIVisibility="Hidden"
             Grid.Row="1" 
-            Grid.Column="1" 
-            Content="{Binding CurrentPage}"/>
+            Grid.Column="0" 
+            Content="{Binding CurrentPage}"/>-->
 
         <wpfui:Snackbar
             x:Name="RootSnackbar"

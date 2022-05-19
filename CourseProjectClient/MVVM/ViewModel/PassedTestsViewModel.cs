@@ -62,9 +62,9 @@ namespace CourseProjectClient.MVVM.ViewModel
                     Ended = DateTimeOffset.FromUnixTimeSeconds(x.Ended ?? 0).DateTime
                 }));
             }
-            catch (DefaultException e)
+            catch (AggregateException e) when (e.InnerException is DefaultException)
             {
-                e.ShowSnackBar();
+                (e.InnerException as DefaultException).ShowSnackBar();
             }
         }
 
@@ -79,18 +79,22 @@ namespace CourseProjectClient.MVVM.ViewModel
                 {
                     GetStartTestResult result = 
                         Task.Run<GetStartTestResult>(async () => await CommunicationService.StartTest(Convert.ToInt32(_testId))).Result;
-                    NavigationMediator.SetRootPage(new TestViewer(new Attempt 
+
+                    var model = new TestViewModel();
+                    var attempt = new Attempt
                     {
                         Id = result.AttemptId,
                         UserId = AuthenticationProvider.GetInstance().UserId,
                         TestId = Convert.ToInt32(_testId),
                         Started = DateTimeOffset.FromUnixTimeSeconds(result.Started).DateTime,
                         Ended = DateTimeOffset.FromUnixTimeSeconds(result.Started + (result.Limit ?? 0)).DateTime
-                    }));
+                    };
+                    model.Attempt = attempt;
+                    NavigationMediator.SetRootViewModel(model);
                 }
-                catch (DefaultException e)
+                catch (AggregateException e) when (e.InnerException is DefaultException)
                 {
-                    e.ShowSnackBar();
+                    (e.InnerException as DefaultException).ShowSnackBar();
                 }
             }, () =>
             {

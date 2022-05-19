@@ -47,7 +47,7 @@ namespace CourseProjectClient.MVVM.ViewModel
         {
             GoToSignUpCommand = new RelayCommand(() =>
             {
-                NavigationMediator.SetRootPage(new SignUp());
+                NavigationMediator.SetRootViewModel(new SignUpViewModel());
             });
 
             LogInCommand = new RelayCommand(() =>
@@ -56,11 +56,11 @@ namespace CourseProjectClient.MVVM.ViewModel
                 {
                     AuthResult result = Task.Run<AuthResult>(async () => await CommunicationService.GetAuth(_login, _password)).Result;
                     AuthenticationProvider.GetInstance().Apply(result);
-                    NavigationMediator.SetRootPage(new TestListView());
+                    NavigationMediator.SetRootViewModel(new TestListViewModel());
                 }
-                catch (DefaultException e)
+                catch (AggregateException e) when (e.InnerException is DefaultException)
                 {
-                    e.ShowSnackBar();
+                    (e.InnerException as DefaultException).ShowSnackBar();
                 }
             });
         }

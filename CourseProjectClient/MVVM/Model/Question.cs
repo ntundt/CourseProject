@@ -21,6 +21,7 @@ namespace CourseProjectClient.MVVM.Model
             {
                 _id = value;
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(Id)));
+                Unsaved = true;
             }
         }
 
@@ -31,6 +32,7 @@ namespace CourseProjectClient.MVVM.Model
             {
                 _text = value;
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(Text)));
+                Unsaved = true;
             }
         }
 
@@ -42,6 +44,7 @@ namespace CourseProjectClient.MVVM.Model
             {
                 _index = value;
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(Index)));
+                Unsaved = true;
             }
         }
 
@@ -53,6 +56,7 @@ namespace CourseProjectClient.MVVM.Model
             {
                 _mark = value;
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(Mark)));
+                Unsaved = true;
             }
         }
 
@@ -64,6 +68,7 @@ namespace CourseProjectClient.MVVM.Model
             {
                 _maxMark = value;
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(MaxMark)));
+                Unsaved = true;
             } 
         }
 
@@ -75,6 +80,7 @@ namespace CourseProjectClient.MVVM.Model
             {
                 _questionType = value;
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(QuestionType)));
+                Unsaved = true;
             }
         }
 
@@ -86,6 +92,7 @@ namespace CourseProjectClient.MVVM.Model
             {
                 _checkAlgorithm = value;
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(CheckAlgorithm)));
+                Unsaved = true;
             } 
         }
 
@@ -97,6 +104,14 @@ namespace CourseProjectClient.MVVM.Model
             {
                 _answerOptions = value;
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(AnswerOptions)));
+                Unsaved = true;
+                foreach (var item in _answerOptions)
+                {
+                    item.PropertyChanged += (_sender, _e) =>
+                    {
+                        Unsaved = true;
+                    };
+                }
             }
         }
 
@@ -109,6 +124,32 @@ namespace CourseProjectClient.MVVM.Model
                 _stringInputAnswerOption = value;
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(StringInputAnswerOption)));
             }
+        }
+
+        private bool _unsaved = true;
+        public bool Unsaved
+        {
+            get => _unsaved;
+            set
+            {
+                _unsaved = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(Unsaved)));
+            }
+        }
+
+        public Question()
+        {
+            AnswerOptions.CollectionChanged += (sender, e) =>
+            {
+                Unsaved = true;
+                foreach (var item in e.NewItems)
+                {
+                    (item as AnswerOption).PropertyChanged += (_sender, _e) =>
+                    {
+                        Unsaved = true;
+                    };
+                }
+            };
         }
     }
 

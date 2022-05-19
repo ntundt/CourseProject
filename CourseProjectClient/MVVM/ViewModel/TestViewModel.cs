@@ -28,7 +28,9 @@ namespace CourseProjectClient.MVVM.ViewModel
             set
             {
                 _attempt = value;
+                RetrieveQuestions();
                 PropertyChanged(this, new PropertyChangedEventArgs("Attempt"));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(Questions)));
             } 
         }
 
@@ -85,44 +87,48 @@ namespace CourseProjectClient.MVVM.ViewModel
 
         private void RetrieveQuestions()
         {
-            var questionsInfo = Task.Run<List<QuestionInfo>>(async () => await CommunicationService.GetAttemptQuestions(_attempt.Id)).Result;
+            try
+            {
+                var questionsInfo = Task.Run<List<QuestionInfo>>(async () => await CommunicationService.GetAttemptQuestions(_attempt.Id)).Result;
 
-            ObservableCollection<Question> questions = new ObservableCollection<Question>(
-                questionsInfo.Select(info => new Question
-                {
-                    Id = info.QuestionId,
-                    Text = info.Text,
-                    Index = info.Index,
-                    QuestionType = info.QuestionType,
-                    CheckAlgorithm = info.CheckAlgorithm,
-                    AnswerOptions = new ObservableCollection<AnswerOption>(info.AnswerOptions.Select(x => new AnswerOption
+                ObservableCollection<Question> questions = new ObservableCollection<Question>(
+                    questionsInfo.Select(info => new Question
                     {
-                        Id = x.AnswerId,
-                        Text = x.Text,
-                        IsChecked = x.Checked ?? false
-                    }).ToList())
-                }).ToList()
-            );
+                        Id = info.QuestionId,
+                        Text = info.Text,
+                        Index = info.Index,
+                        QuestionType = info.QuestionType,
+                        CheckAlgorithm = info.CheckAlgorithm,
+                        AnswerOptions = new ObservableCollection<AnswerOption>(info.AnswerOptions.Select(x => new AnswerOption
+                        {
+                            Id = x.AnswerId,
+                            Text = x.Text,
+                            IsChecked = x.Checked ?? false
+                        }).ToList())
+                    }).ToList()
+                );
 
-            Questions = questions;
+                Questions = questions;
 
-            SelectedQuestion = questions[0];
+                SelectedQuestion = questions[0];
+            }
+            catch (AggregateException e) when (e.InnerException is DefaultException)
+            {
+                (e.InnerException as DefaultException).ShowSnackBar();
+            }
         }
 
-        public TestViewModel(Attempt attempt)
+        public TestViewModel()
         {
-            _attempt = attempt;
-
-            RetrieveQuestions();
-
             SaveAnswer = new RelayCommand(() =>
             {
                 try
                 {
                     Task.Run(async () => await CommunicationService.SaveAnswer(_attempt.Id, SelectedQuestion));
-                } catch (DefaultException e)
+                }
+                catch (AggregateException e) when (e.InnerException is DefaultException)
                 {
-                    e.ShowSnackBar();
+                    (e.InnerException as DefaultException).ShowSnackBar();
                 }
             });
 
@@ -131,9 +137,10 @@ namespace CourseProjectClient.MVVM.ViewModel
                 try
                 {
                     Task.Run(async () => await CommunicationService.EndTest(_attempt.Id));
-                } catch (DefaultException e)
+                }
+                catch (AggregateException e) when (e.InnerException is DefaultException)
                 {
-                    e.ShowSnackBar();
+                    (e.InnerException as DefaultException).ShowSnackBar();
                 }
             });
         }

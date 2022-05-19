@@ -19,7 +19,7 @@ namespace CourseProjectClient.MVVM.View
     /// <summary>
     /// Логика взаимодействия для TestEditor.xaml
     /// </summary>
-    public partial class TestEditor : Page
+    public partial class TestEditor : UserControl
     {
         public TestEditor()
         {

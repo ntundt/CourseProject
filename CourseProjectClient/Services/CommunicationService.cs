@@ -205,5 +205,134 @@ namespace CourseProjectClient.Services
                 }
             }
         }
+
+        public static async Task<PostTestResult> CreateTest(TestInfoSetter parameters)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                string json = JsonConvert.SerializeObject(parameters);
+                HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var serverResponse = await client.PostAsync(_baseAddress + $"tests", content);
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    PostTestResult result = JsonConvert.DeserializeObject<PostTestResult>(response);
+                    return result;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
+    
+        public static async Task<TestInfo> GetTest(int testId)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var serverResponse = await client.GetAsync(_baseAddress + $"tests/{testId}");
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    TestInfo result = JsonConvert.DeserializeObject<TestInfo>(response);
+                    return result;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
+    
+        public static async Task DeleteQuestion(int testId, int questionId) {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var serverResponse = await client.DeleteAsync(_baseAddress + $"tests/{testId}/questions/{questionId}");
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    return;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
+    
+        public static async Task<PostQuestionResult> CreateQuestion(int testId) {
+            using (HttpClient client = new HttpClient())
+            {
+                HttpContent content = new StringContent("", Encoding.UTF8, "application/json");
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var serverResponse = await client.PostAsync(_baseAddress + $"tests/{testId}/questions", content);
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    PostQuestionResult result = JsonConvert.DeserializeObject<PostQuestionResult>(response);
+                    return result;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
+    
+        public static async Task<List<QuestionInfo>> GetTestQuestions(int testId) 
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var serverResponse = await client.GetAsync(_baseAddress + $"tests/{testId}/questions");
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    List<QuestionInfo> result = JsonConvert.DeserializeObject<List<QuestionInfo>>(response);
+                    return result;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
+    
+        public static async Task SaveQuestion(int testId, int questionId, PutQuestion question) {
+            using (HttpClient client = new HttpClient())
+            {
+                string json = JsonConvert.SerializeObject(question);
+                HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var serverResponse = await client.PutAsync(_baseAddress + $"tests/{testId}/questions/{questionId}", content);
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    return;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
     }
 }

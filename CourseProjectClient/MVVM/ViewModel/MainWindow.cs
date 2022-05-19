@@ -14,7 +14,13 @@ namespace CourseProjectClient.MVVM.ViewModel
     internal class MainWindow : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        
+
+        private Stack<object> _viewModels = new Stack<object>();
+        public object CurrentViewModel
+        {
+            get => _viewModels.Peek();
+        }
+
         private Stack<Page> _pages = new Stack<Page>();
         public Page CurrentPage
         {
@@ -25,6 +31,26 @@ namespace CourseProjectClient.MVVM.ViewModel
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(CurrentPage)));
             }
         }
+
+
+        public void SetRootViewModel(object vm)
+        {
+            _viewModels.Clear();
+            _viewModels.Push(vm);
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(CurrentViewModel)));
+        }
+        public void GoBackVM()
+        {
+            _viewModels.Pop();
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(CurrentViewModel)));
+        }
+        public void ReplaceCurrentViewModel(object vm)
+        {
+            _viewModels.Pop();
+            _viewModels.Push(vm);
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(CurrentViewModel)));
+        }
+
         public void GoBack() {
             _pages.Pop();
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(CurrentPage)));
@@ -44,19 +70,17 @@ namespace CourseProjectClient.MVVM.ViewModel
         
         public MainWindow()
         {
-            NavigationMediator.CurrentPageUpdated += (page) => CurrentPage = page;
-            NavigationMediator.CurrentPageClosed += () => GoBack();
-            NavigationMediator.RootPageSet += (page) => SetRootPage(page);
-            
+            NavigationMediator.RootViewModelSet += SetRootViewModel;
+            NavigationMediator.CurrentViewModelClosed += GoBackVM;
+            NavigationMediator.CurrentViewModelUpdated += ReplaceCurrentViewModel;
+
             if (AuthenticationProvider.GetInstance().ReadFromFile())
             {
-                TestListView testList = new TestListView();
-                NavigationMediator.SetRootPage(testList);
+                NavigationMediator.SetRootViewModel(new TestListViewModel());
                 return;
-            } 
+            }
 
-            SignUp signup = new SignUp();
-            NavigationMediator.SetRootPage(signup);
+            NavigationMediator.SetRootViewModel(new SignUpViewModel());
         }
     }
 }

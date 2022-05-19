@@ -35,16 +35,18 @@ namespace CourseProjectClient.MVVM.ViewModel
         public SignUpViewModel()
         {
             GoToLogIn = new RelayCommand(() => {
-                NavigationMediator.SetRootPage(new LogIn());
+                NavigationMediator.SetRootViewModel(new LogInViewModel());
             });
             
             SignUpCommand = new RelayCommand(() => {
                 try {
                     AuthResult result = Task.Run<AuthResult>(async () => await CommunicationService.GetAuth(_name)).Result;
                     AuthenticationProvider.GetInstance().Apply(result);
-                    NavigationMediator.SetRootPage(new TestListView());
-                } catch (DefaultException e) {
-                    e.ShowSnackBar();
+                    NavigationMediator.SetRootViewModel(new TestListViewModel());
+                }
+                catch (AggregateException e) when (e.InnerException is DefaultException)
+                {
+                    (e.InnerException as DefaultException).ShowSnackBar();
                 }
             });
         }

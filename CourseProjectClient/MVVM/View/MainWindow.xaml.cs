@@ -21,8 +21,8 @@ namespace CourseProjectClient.MVVM.View
     {
         public MainWindow()
         {
-            InitializeComponent();
             DataContext = new ViewModel.MainWindow();
+            InitializeComponent();
         }
     }
 }

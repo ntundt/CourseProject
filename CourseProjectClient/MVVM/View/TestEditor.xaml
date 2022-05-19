@@ -1,4 +1,4 @@
-﻿<Page x:Class="CourseProjectClient.MVVM.View.TestEditor"
+﻿<UserControl x:Class="CourseProjectClient.MVVM.View.TestEditor"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -10,15 +10,15 @@
       xmlns:dto="clr-namespace:DataTransferObject;assembly=DataTransferObject"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="TestEditor">
+      d:DataContext="{d:DesignInstance viewmodel:TestEditViewModel}">
 
-    <Page.DataContext>
+    <!--<Page.DataContext>
         <viewmodel:TestEditViewModel/>
-    </Page.DataContext>
+    </Page.DataContext>-->
 
-    <Page.Resources>
+    <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
-    </Page.Resources>
+    </UserControl.Resources>
 
     <Grid>
 
@@ -35,6 +35,19 @@
                 <StackPanel
                         DockPanel.Dock="Top"
                         VerticalAlignment="Stretch">
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <Label 
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Margin="5,5,10,0"
+                            FontSize="18"
+                            Content="Тест"/>
+                        <Label
+                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                            Margin="0,0,5,0"
+                            FontSize="18"
+                            Content="{Binding Test.Id}"/>
+                    </StackPanel>
                     <TextBlock 
                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Margin="5,5,5,0"
@@ -100,7 +113,7 @@
                     Margin="5"
                     Appearance="Success"
                     Command="{Binding SaveCommand}"
-                    Content="Сохранить" Cursor="Hand"/>
+                    Content="Сохранить и открыть" Cursor="Hand"/>
             </DockPanel>
         </ScrollViewer>
 
@@ -109,6 +122,23 @@
             Padding="10">
 
             <StackPanel>
+                <StackPanel 
+                    Margin="0,0,0,5"
+                    Orientation="Horizontal">
+                    <Label 
+                        FontSize="18"
+                        Content="Вопрос "/>
+                    <Label 
+                        FontSize="18"
+                        Content="{Binding SelectedQuestion.Index}"
+                        Margin="0,0,5,0"/>
+                    <wpfui:Button 
+                        Appearance="Danger"
+                        Icon="Delete24"
+                        Command="{Binding DeleteQuestionCommand}"/>
+                </StackPanel>
+
+
                 <wpfui:TextBox 
                     MinLines="3" 
                     AcceptsReturn="True" 
@@ -157,6 +187,13 @@
                         Placeholder="Ответ"
                         Visibility="{Binding StringInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Text="{Binding SelectedQuestion.StringInputAnswerOption.Text}"/>
+                    <wpfui:Button
+                        Margin="0,5,0,0"
+                        Appearance="Success"
+                        Content="Сохранить"
+                        MaxWidth="150"
+                        HorizontalAlignment="Left"
+                        Command="{Binding SaveQuestionCommand}" Cursor="Hand"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
@@ -206,4 +243,4 @@
             </StackPanel>
         </ScrollViewer>
     </Grid>
-</Page>
+</UserControl>

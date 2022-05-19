@@ -91,10 +91,10 @@ namespace CourseProjectServer.Repositories
                     PublicUntil = reader.GetFieldValue<DateTime>("PUBLIC_UNTIL"),
                     PrivateUntil = reader.GetFieldValue<DateTime>("PRIVATE_UNTIL")
                 },
-                Index = reader.GetFieldValue<int>("QINDEX"),
-                Text = reader.GetFieldValue<string>("QQUESTION"),
-                QuestionType = reader.GetFieldValue<QuestionType>("QTYPE"),
-                ChechAlgorithm = reader.GetFieldValue<CheckAlgorithm>("QALGORITHM"),
+                Index = reader.GetFieldValue<int>("QUESTION_INDEX"),
+                Text = reader.GetFieldValue<string>("QUESTION"),
+                QuestionType = reader.GetFieldValue<QuestionType>("TYPE"),
+                ChechAlgorithm = reader.GetFieldValue<CheckAlgorithm>("CHECK_ALGORITHM"),
                 AnswerOptions = new List<AnswerOption>()
             };
 
@@ -126,12 +126,12 @@ namespace CourseProjectServer.Repositories
                 $"  QUESTION.QUESTION_INDEX, " +
                 $"  QUESTION.QUESTION, " +
                 $"  QUESTION.TYPE, " +
-                $"  QUESTION.CHECK_ALGORITHM " +
+                $"  QUESTION.CHECK_ALGORITHM, " +
 
                 $"  ANSWER_OPTION.ID AID, " +
                 $"  ANSWER_OPTION.QUESTION_ID, " +
                 $"  ANSWER_OPTION.ANSWER, " +
-                $"  ANSWER_OPTION.IS_CORRECT " +
+                $"  ANSWER_OPTION.CORRECT " +
 
                 $"FROM " +
                 $"  QUESTION " +
@@ -469,7 +469,7 @@ namespace CourseProjectServer.Repositories
             command.Parameters.Add(reserved);
 
             SqlParameter question_text = new("@question_text", SqlDbType.NVarChar, 4000);
-            question_text.Value = question.Text;
+            question_text.Value = question.Text ?? "";
             command.Parameters.Add(question_text);
 
             SqlParameter type = new("@type", SqlDbType.Int);
@@ -518,7 +518,9 @@ namespace CourseProjectServer.Repositories
 
             var queryString =
                 $"DELETE FROM ANSWER_OPTION WHERE QUESTION_ID = @question_id;" +
-                $"INSERT INTO ANSWER_OPTION (QUESTION_ID, ANSWER, CORRECT) VALUES {string.Join(",", values)};";
+                (values.Count > 0 ? 
+                    $"INSERT INTO ANSWER_OPTION (QUESTION_ID, ANSWER, CORRECT) VALUES {string.Join(",", values)};"
+                    : "");
 
             using SqlConnection connection = new(_config.GetConnectionString("MsSql"));
             connection.Open();
@@ -528,6 +530,23 @@ namespace CourseProjectServer.Repositories
             {
                 command.Parameters.Add(parameter);
             }
+
+            command.Prepare();
+            command.ExecuteNonQuery();
+        }
+    
+        public void DeleteById(int id)
+        {
+            var queryString =
+                $"EXEC DELETE_QUESTION @question_id";
+
+            using SqlConnection connection = new(_config.GetConnectionString("MsSql"));
+            connection.Open();
+            SqlCommand command = new(queryString, connection);
+
+            SqlParameter question_id = new("@question_id", SqlDbType.Int);
+            question_id.Value = id;
+            command.Parameters.Add(question_id);
 
             command.Prepare();
             command.ExecuteNonQuery();
