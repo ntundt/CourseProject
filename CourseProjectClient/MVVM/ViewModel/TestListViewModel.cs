@@ -10,6 +10,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using WPFUI.Common;
 
 namespace CourseProjectClient.MVVM.ViewModel
 {
@@ -22,6 +24,8 @@ namespace CourseProjectClient.MVVM.ViewModel
     class TestListViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        public ICommand GoToUserSettings { get; set; }
 
         private PageSelected _selectedPage = PageSelected.Passed;
         public PageSelected SelectedPage
@@ -56,6 +60,11 @@ namespace CourseProjectClient.MVVM.ViewModel
         public TestListViewModel()
         {
             SelectedPage = PageSelected.Passed;
+
+            GoToUserSettings = new RelayCommand(() =>
+            {
+                NavigationMediator.SetRootViewModel(new UserSettingsViewModel());
+            });
         }
     }
 }

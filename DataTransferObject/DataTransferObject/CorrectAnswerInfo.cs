@@ -3,6 +3,7 @@ using System.Collections.Generic;
 namespace DataTransferObject {
     public class CorrectAnswerInfo {
         public int QuestionId { get; set; }
+        public int Index { get; set;}
         public string Text { get; set; } = "";
         public double Mark { get; set; }
         public double MaxMark { get; set; }

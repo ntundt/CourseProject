@@ -1,0 +1,127 @@
+﻿<UserControl x:Class="CourseProjectClient.MVVM.View.AttemptResultView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:CourseProjectClient.MVVM.View"
+             xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:viewmodel="clr-namespace:CourseProjectClient.MVVM.ViewModel"
+             xmlns:dto="clr-namespace:DataTransferObject;assembly=DataTransferObject"
+             xmlns:converter="clr-namespace:CourseProjectClient.Converters"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewmodel:AttemptResultViewModel}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <ScrollViewer>
+        <StackPanel 
+            HorizontalAlignment="Center"
+            MinWidth="500">
+
+            <wpfui:Card
+                Margin="0,0,0,5">
+                <DockPanel>
+                    <StackPanel
+                        Orientation="Horizontal">
+                        <Label 
+                            DockPanel.Dock="Left"
+                            VerticalAlignment="Center"
+                            Content="Баллы: "/>
+                        <Label
+                            VerticalAlignment="Center"
+                            Content="{Binding ResultInfo.Mark}"/>
+                        <Label
+                            VerticalAlignment="Center"
+                            Content="/"/>
+                        <Label
+                            VerticalAlignment="Center"
+                            Content="{Binding ResultInfo.Answers.Count}"/>
+                    </StackPanel>
+                    <wpfui:Button 
+                        Width="100"
+                        Command="{Binding OkCommand}"
+                        HorizontalAlignment="Right"
+                        DockPanel.Dock="Right"
+                        Content="Понятно"/>
+                </DockPanel>
+            </wpfui:Card>
+            
+            <ListBox 
+                ItemsSource="{Binding ResultInfo.Answers}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel
+                            Orientation="Vertical"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+
+                            <StackPanel.Resources>
+                                <viewmodel:ComparisonConverter x:Key="ComparisonConverter" />
+                                <converter:BooleanToForegroundConverter x:Key="BoolToForeground" />
+                            </StackPanel.Resources>
+
+                            <StackPanel
+                                Orientation="Horizontal">
+                                <Label 
+                                    Content="Вопрос "/>
+                                <Label
+                                    Content="{Binding Index}"/>
+                            </StackPanel>
+                                
+                            <TextBlock
+                                Margin="0,0,0,5"
+                                Text="{Binding Text}"/>
+                            
+                            <ListBox
+                                Visibility="{Binding QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter=0}"
+                                ItemsSource="{Binding Options}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <RadioButton 
+                                            IsChecked="{Binding Checked}"
+                                            IsEnabled="False"
+                                            Foreground="{Binding IsActuallyCorrect, Converter={StaticResource BoolToForeground}}"
+                                            Content="{Binding Text}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <ListBox
+                                Visibility="{Binding QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter=1}"
+                                ItemsSource="{Binding Options}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox
+                                            IsChecked="{Binding Checked}"
+                                            IsEnabled="False"
+                                            Foreground="{Binding IsActuallyCorrect, Converter={StaticResource BoolToForeground}}"
+                                            Content="{Binding Text}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <StackPanel
+                                Visibility="{Binding QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter=2}">
+                                <StackPanel
+                                    Visibility="{Binding Options[0].Checked, Converter={StaticResource ComparisonConverter}, ConverterParameter=false}"
+                                    Orientation="Horizontal">
+                                    <Label Content="Ответ: " />
+                                    <Label Content="{Binding Options[1].Text}" />
+                                </StackPanel>
+                                <StackPanel
+                                    Orientation="Horizontal">
+                                    <Label Content="Правильный ответ: " />
+                                    <Label Content="{Binding Options[0].Text}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

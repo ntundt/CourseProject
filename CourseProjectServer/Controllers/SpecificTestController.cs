@@ -80,5 +80,20 @@ namespace CourseProjectServer.Controllers
                 Limit = attempt.Test.HasTimeLimit() ? ((DateTimeOffset)(attempt.Started + attempt.Test.TimeLimit)).ToUnixTimeSeconds() : null
             };
         }
+
+        [Route("results")]
+        [HttpGet]
+        public List<ResultInfo> GetTestResults([FromRoute] int testId)
+        {
+            User user = userDao.GetByAccessToken(Request.Headers.Authorization);
+            Test test = testDao.GetTestById(testId);
+
+            if (test.IsPrivate() && test.Author.UserId != user.UserId)
+            {
+                throw new CanNotAccessPrivateTestException(testId);
+            }
+
+            return testDao.GetResults(test).Select(r => { r.ComputeMark(); return r.ToResultInfo(); }).ToList();
+        }
     }
 }

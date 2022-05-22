@@ -72,7 +72,16 @@ namespace CourseProjectClient.MVVM.ViewModel
         {
             RetrievePassedTests();
 
-            SeeResults = new RoutedUICommand();
+            SeeResults = new RelayCommand((id) =>
+            {
+                if (!(id is int))
+                {
+                    return;
+                }
+                AttemptResultViewModel page = new AttemptResultViewModel();
+                page.SetAttemptId((int)id);
+                NavigationMediator.SetRootViewModel(page);
+            });
             StartAttempt = new RelayCommand(() =>
             {
                 try

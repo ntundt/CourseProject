@@ -57,6 +57,50 @@ namespace CourseProjectClient.Services
             }
         }
 
+        public static async Task<GetUserInfo> GetUserInfo()
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var serverResponse = await client.GetAsync(_baseAddress + $"auth/info");
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    GetUserInfo result = JsonConvert.DeserializeObject<GetUserInfo>(response);
+                    return result;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
+
+        public static async Task<ActionResult> SaveUserInfo(PutUserInfo info) 
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var content = new StringContent(JsonConvert.SerializeObject(info), Encoding.UTF8, "application/json");
+
+                var serverResponse = await client.PutAsync(_baseAddress + $"auth", content);
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    ActionResult result = JsonConvert.DeserializeObject<ActionResult>(response);
+                    return result;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
+
         public static async Task<GetTestsResult> GetTests()
         {
             using (HttpClient client = new HttpClient())
@@ -172,19 +216,19 @@ namespace CourseProjectClient.Services
                 {
                     answer = new PutAnswer
                     {
-                        SelectedOption = question.AnswerOptions.First(x => x.IsChecked).Id
+                        SelectedOption = question.AnswerOptions.First(x => x.SingleChoiseSelected).Id
                     };
                 } else if (question.QuestionType == QuestionType.MultipleChoise)
                 {
                     answer = new PutAnswer
                     {
-                        SelectedOptions = question.AnswerOptions.Where(x => x.IsChecked).Select(x => x.Id).ToList().ToArray()
+                        SelectedOptions = question.AnswerOptions.Where(x => x.MultipleChoiseSelected).Select(x => x.Id).ToList().ToArray()
                     };
                 } else
                 {
                     answer = new PutAnswer
                     {
-                        Answer = question.AnswerOptions.Select(x => x.Text).First() ?? ""
+                        Answer = question.StringInputAnswerOption.Text
                     };
                 }
 
@@ -326,6 +370,72 @@ namespace CourseProjectClient.Services
                 if (serverResponse.IsSuccessStatusCode)
                 {
                     return;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
+
+        public static async Task<ResultInfo> GetResultInfo(int attemptId)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var serverResponse = await client.GetAsync(_baseAddress + $"attempts/{attemptId}/results");
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    ResultInfo result = JsonConvert.DeserializeObject<ResultInfo>(response);
+                    return result;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
+
+        public static async Task<List<ResultInfo>> GetTestResultsInfo(int testId)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var serverResponse = await client.GetAsync(_baseAddress + $"tests/{testId}/results");
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    List<ResultInfo> result = JsonConvert.DeserializeObject<List<ResultInfo>>(response);
+                    return result;
+                }
+                else
+                {
+                    ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
+                    throw new DefaultException(error.Code, error.Message);
+                }
+            }
+        }
+
+        public static async Task<TestInfo> PutTest(int testId, TestInfoSetter setter)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                string json = JsonConvert.SerializeObject(setter);
+                HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(AuthenticationProvider.GetInstance().AccessToken);
+                var serverResponse = await client.PutAsync(_baseAddress + $"tests/{testId}", content);
+                string response = await serverResponse.Content.ReadAsStringAsync();
+
+                if (serverResponse.IsSuccessStatusCode)
+                {
+                    TestInfo result = JsonConvert.DeserializeObject<TestInfo>(response);
+                    return result;
                 }
                 else
                 {

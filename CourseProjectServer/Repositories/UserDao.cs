@@ -2,6 +2,7 @@
 using CourseProjectServer.Extension;
 using CourseProjectServer.Model;
 using System.Data.SqlClient;
+using System.Data;
 
 namespace CourseProjectServer.Repositories
 {
@@ -57,7 +58,34 @@ namespace CourseProjectServer.Repositories
 
         public void Update(User user)
         {
-            throw new NotImplementedException();
+            var queryString =
+                $"UPDATE \"USER\" SET " +
+                $"  NAME = @NAME, " +
+                $"  LOGIN = @LOGIN, " +
+                $"  PASSWORD_SHA256 = @PASSWORD_HASH " +
+                $"WHERE ID = @ID;";
+
+            using SqlConnection connection = new(_config.GetConnectionString("MsSql"));
+            connection.Open();
+            SqlCommand command = new(queryString, connection);
+
+            SqlParameter name = new("@NAME", SqlDbType.NVarChar);
+            name.Value = user.Name;
+            command.Parameters.Add(name);
+
+            SqlParameter login = new("@LOGIN", SqlDbType.VarChar);
+            login.Value = user.Login;
+            command.Parameters.Add(login);
+
+            SqlParameter passwordHash = new("@PASSWORD_HASH", SqlDbType.VarChar);
+            passwordHash.Value = user.PasswordHash;
+            command.Parameters.Add(passwordHash);
+
+            SqlParameter id = new("@ID", SqlDbType.Int);
+            id.Value = user.UserId;
+            command.Parameters.Add(id);
+
+            command.ExecuteNonQuery();
         }
 
         public User GetByLogin(string login)

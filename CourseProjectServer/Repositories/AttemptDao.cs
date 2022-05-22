@@ -68,7 +68,7 @@ namespace CourseProjectServer.Repositories
                 $"    QUESTION " +
                 $"    LEFT JOIN ANSWER_OPTION ON QUESTION.ID = ANSWER_OPTION.QUESTION_ID " +
                 $"    LEFT JOIN ONGOING_TEST ON QUESTION.TEST_ID = ONGOING_TEST.TEST_ID " +
-                $"    LEFT JOIN USER_ANSWER ON USER_ANSWER.ANSWER_ID = ANSWER_OPTION.ID " +
+                $"    LEFT JOIN USER_ANSWER ON (USER_ANSWER.ANSWER_ID = ANSWER_OPTION.ID AND USER_ANSWER.ONGOING_TEST_ID = ONGOING_TEST.ID) OR QUESTION.ID = USER_ANSWER.QUESTION_ID " +
                 $"WHERE " +
                 $"    ONGOING_TEST.ID = @attempt_id " +
                 $"ORDER BY " +
@@ -98,6 +98,7 @@ namespace CourseProjectServer.Repositories
                     new CorrectAnswer
                     {
                         QuestionId = reader.GetFieldValue<int>("QUESTION_ID"),
+                        Index = reader.GetFieldValue<int>("QUESTION_INDEX"),
                         Text = reader.GetFieldValue<string>("QUESTION"),
                         QuestionType = (QuestionType)reader.GetFieldValue<int>("TYPE"),
                         CheckAlgorithm = (CheckAlgorithm)reader.GetFieldValue<int>("CHECK_ALGORITHM"),
@@ -119,8 +120,9 @@ namespace CourseProjectServer.Repositories
                     ||
                     (
                         !reader.IsDBNull("USER_ANSWER_ANSWER")
-                        && reader.GetFieldValue<string>("USER_ANSWER_ANSWER") == reader.GetFieldValue<string>("ANSWER_OPTION_ANSWER")
+                        && reader.GetFieldValue<string>("USER_ANSWER_ANSWER").ToLower().Equals(reader.GetFieldValue<string>("ANSWER_OPTION_ANSWER").ToLower())
                     );
+
 
                 bool isCorrect = reader.GetFieldValue<bool>("CORRECT");
 
@@ -131,6 +133,15 @@ namespace CourseProjectServer.Repositories
                     Checked = isChecked,
                     IsActuallyCorrect = isCorrect
                 });
+
+                if (!reader.IsDBNull("USER_ANSWER_ANSWER") && !isChecked)
+                {
+                    answer.Options.Add(new CorrectAnswerOption { 
+                        Text = reader.GetFieldValue<string>("USER_ANSWER_ANSWER"), 
+                        Checked = true, 
+                        IsActuallyCorrect = false
+                    });
+                }
             } while (reader.Read());
 
             result.ComputeMark();

@@ -44,17 +44,19 @@
                             Content="Тест"/>
                         <Label
                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Margin="0,0,5,0"
+                            Margin="0,5,5,0"
                             FontSize="18"
                             Content="{Binding Test.Id}"/>
                     </StackPanel>
-                    <TextBlock 
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                    <CheckBox
+                        IsChecked="{Binding HasTimeLimit}"
                         Margin="5,5,5,0"
-                        Text="Ограничение по времени"/>
-                    <wpfui:TextBox 
+                        Content="Ограничение времени"/>
+                    <wpfui:NumberBox 
+                        IsEnabled="{Binding HasTimeLimit}"
+                        Text="{Binding TimeLimit}"
                         Margin="5,5,5,0"
-                        Placeholder="HH:MM:SS"/>
+                        Placeholder="Минуты"/>
                     <TextBlock
                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Margin="5,5,5,0"

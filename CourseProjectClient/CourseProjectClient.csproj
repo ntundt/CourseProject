@@ -80,12 +80,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\BooleanToForegroundConverter.cs" />
     <Compile Include="Converters\LongToTimeSpanConverter.cs" />
     <Compile Include="Exceptions\DefaultException.cs" />
     <Compile Include="MVVM\Command\StartTestAttemptCommand.cs" />
     <Compile Include="MVVM\Model\Attempt.cs" />
     <Compile Include="MVVM\Model\Question.cs" />
     <Compile Include="MVVM\Model\Test.cs" />
+    <Compile Include="MVVM\ViewModel\AttemptResultViewModel.cs" />
     <Compile Include="MVVM\ViewModel\ChangePageCommand.cs" />
     <Compile Include="MVVM\ViewModel\ComparisonConverter.cs" />
     <Compile Include="MVVM\ViewModel\INavigationRequester.cs" />
@@ -94,10 +96,15 @@
     <Compile Include="MVVM\ViewModel\MyTestsViewModel.cs" />
     <Compile Include="MVVM\ViewModel\NavigationMediator.cs" />
     <Compile Include="MVVM\ViewModel\PassedTestsViewModel.cs" />
+    <Compile Include="MVVM\ViewModel\ResultListViewModel.cs" />
     <Compile Include="MVVM\ViewModel\SignUpViewModel.cs" />
     <Compile Include="MVVM\ViewModel\TestEditViewModel.cs" />
     <Compile Include="MVVM\ViewModel\TestListViewModel.cs" />
     <Compile Include="MVVM\ViewModel\TestViewModel.cs" />
+    <Compile Include="MVVM\ViewModel\UserSettingsViewModel.cs" />
+    <Compile Include="MVVM\View\AttemptResultView.xaml.cs">
+      <DependentUpon>AttemptResultView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MVVM\View\LogIn.xaml.cs">
       <DependentUpon>LogIn.xaml</DependentUpon>
     </Compile>
@@ -106,6 +113,9 @@
     </Compile>
     <Compile Include="MVVM\View\PassedTestsView.xaml.cs">
       <DependentUpon>PassedTestsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MVVM\View\ResultListView.xaml.cs">
+      <DependentUpon>ResultListView.xaml</DependentUpon>
     </Compile>
     <Compile Include="MVVM\View\SignUp.xaml.cs">
       <DependentUpon>SignUp.xaml</DependentUpon>
@@ -116,6 +126,9 @@
     <Compile Include="MVVM\View\TestViewer.xaml.cs">
       <DependentUpon>TestViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MVVM\View\UserSettings.xaml.cs">
+      <DependentUpon>UserSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Services\AuthenticationProvider.cs" />
     <Compile Include="Services\CommunicationService.cs" />
     <Compile Include="App.xaml.cs">
@@ -123,6 +136,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="MVVM\UserContols\TestCard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MVVM\View\AttemptResultView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -142,6 +159,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="MVVM\View\ResultListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MVVM\View\SignUp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -155,6 +176,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MVVM\View\TestViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MVVM\View\UserSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -48,26 +48,36 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
-            <StackPanel 
-                Orientation="Horizontal" 
-                HorizontalAlignment="Center">
-                <StackPanel.Resources>
-                    <viewmodel:ComparisonConverter x:Key="ComparisonConverter" />
-                </StackPanel.Resources>
-                <RadioButton 
-                    x:Name="PassedButton" 
-                    Cursor="Hand" 
-                    Style="{StaticResource Bruh}"
-                    IsChecked="{Binding Path=SelectedPage, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static viewmodel:PageSelected.Passed}}"
-                    Content="Пройденные"
-                    Margin="0,0,5,0"/>
-                <RadioButton 
-                    x:Name="MyButton"
-                    Cursor="Hand"
-                    Style="{StaticResource Bruh}"
-                    IsChecked="{Binding Path=SelectedPage, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static viewmodel:PageSelected.My}}"
-                    Content="Мои"/>
-            </StackPanel>
+            <DockPanel
+                HorizontalAlignment="Stretch">
+
+                <wpfui:Button 
+                    Appearance="Secondary"
+                    Icon="Settings24"
+                    Margin="5"
+                    Command="{Binding GoToUserSettings}" Cursor="Hand"/>
+
+                <StackPanel 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center">
+                    <StackPanel.Resources>
+                        <viewmodel:ComparisonConverter x:Key="ComparisonConverter" />
+                    </StackPanel.Resources>
+                    <RadioButton 
+                        x:Name="PassedButton" 
+                        Cursor="Hand" 
+                        Style="{StaticResource Bruh}"
+                        IsChecked="{Binding Path=SelectedPage, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static viewmodel:PageSelected.Passed}}"
+                        Content="Пройденные"
+                        Margin="0,0,5,0"/>
+                    <RadioButton 
+                        x:Name="MyButton"
+                        Cursor="Hand"
+                        Style="{StaticResource Bruh}"
+                        IsChecked="{Binding Path=SelectedPage, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static viewmodel:PageSelected.My}}"
+                        Content="Мои"/>
+                </StackPanel>
+            </DockPanel>
         </Grid>
 
         <Grid Grid.Row="1">

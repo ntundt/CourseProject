@@ -20,6 +20,8 @@ namespace CourseProjectClient.MVVM.ViewModel
 
         public ICommand CreateTest { get; set; }
 
+        public ICommand ViewResults { get; set; }
+
         private ObservableCollection<Test> _myTests;
         public ObservableCollection<Test> MyTests
         {
@@ -68,6 +70,20 @@ namespace CourseProjectClient.MVVM.ViewModel
                     testvm.SetTestId(result.TestId);
 
                     NavigationMediator.SetRootViewModel(testvm);
+                }
+                catch (AggregateException e) when (e.InnerException is DefaultException)
+                {
+                    (e.InnerException as DefaultException).ShowSnackBar();
+                }
+            });
+
+            ViewResults = new RelayCommand((id) =>
+            {
+                try
+                {
+                    ResultListViewModel model = new ResultListViewModel();
+                    model.SetTestId((int)id);
+                    NavigationMediator.SetRootViewModel(model);
                 }
                 catch (AggregateException e) when (e.InnerException is DefaultException)
                 {

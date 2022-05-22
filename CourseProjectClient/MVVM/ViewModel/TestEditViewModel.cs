@@ -103,6 +103,28 @@ namespace CourseProjectClient.MVVM.ViewModel
             }
         }
 
+        private bool _hasTimeLimit;
+        public bool HasTimeLimit
+        {
+            get => _hasTimeLimit;
+            set
+            {
+                _hasTimeLimit = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(HasTimeLimit)));
+            }
+        }
+
+        private int _timeLimit;
+        public int TimeLimit
+        {
+            get => _timeLimit;
+            set
+            {
+                _timeLimit = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(TimeLimit)));
+            }
+        }
+
         private Test _test;
         public Test Test
         {
@@ -308,6 +330,26 @@ namespace CourseProjectClient.MVVM.ViewModel
             }
         }
 
+        private bool ValidateQuestions()
+        {
+            foreach (Question question in _questions)
+            {
+                if (question.AnswerOptions.Count == 0 && (question.StringInputAnswerOption.Text ?? "").Equals(""))
+                {
+                    SelectedQuestion = question;
+                    new DefaultException(0, "Для вопроса не указан ответ").ShowSnackBar();
+                    return false;
+                }
+                if (question.AnswerOptions.Count > 0 && question.AnswerOptions.Any(x=> !x.IsChecked))
+                {
+                    SelectedQuestion = question;
+                    new DefaultException(0, "Для вопроса не указан правильный ответ").ShowSnackBar();
+                    return false;
+                } 
+            }
+            return true;
+        }
+
         public TestEditViewModel()
         {
             Question question = new Question()
@@ -422,7 +464,21 @@ namespace CourseProjectClient.MVVM.ViewModel
 
             SaveCommand = new RelayCommand(() =>
             {
-                NavigationMediator.SetRootViewModel(new TestListViewModel());
+                if (ValidateQuestions())
+                {
+                    try 
+                    {
+                        Task.Run<TestInfo>(async () => await CommunicationService.PutTest(this._test.Id, new TestInfoSetter
+                        {
+                            TimeLimit = _hasTimeLimit ? _timeLimit * 60 : 0
+                        }));
+                        NavigationMediator.SetRootViewModel(new TestListViewModel());
+                    }
+                    catch (AggregateException e) when (e.InnerException is DefaultException)
+                    {
+                        (e.InnerException as DefaultException).ShowSnackBar();
+                    }
+                }
             });
         }
     }

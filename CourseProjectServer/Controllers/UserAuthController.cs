@@ -76,5 +76,41 @@ namespace CourseProjectServer.Controllers
                 CreatedDate = ((DateTimeOffset)user.CreatedDate).ToUnixTimeSeconds()
             };
         }
+
+        [Route("info")]
+        [HttpGet]
+        public GetUserInfo GetInfo()
+        {
+            User user = userDao.GetByAccessToken(Request.Headers.Authorization);
+
+            return new GetUserInfo
+            {
+                Name = user.Name,
+                Login = user.Login
+            };
+        }
+
+        [HttpPut]
+        public DataTransferObject.ActionResult PutUserInfo([FromBody] PutUserInfo userInfo)
+        {
+            User user = userDao.GetByAccessToken(Request.Headers.Authorization);
+
+            if (userInfo.Name != null)
+            {
+                user.Name = userInfo.Name;
+            }
+            if (userInfo.Login != null)
+            {
+                user.Login = userInfo.Login;
+            }
+            if (userInfo.Password != null)
+            {
+                var sha256 = SHA256.Create().ComputeHash(Encoding.ASCII.GetBytes(userInfo.Password + "salt"));
+                user.PasswordHash = BitConverter.ToString(sha256).Replace("-", "").ToLower();
+            }
+            userDao.Update(user);
+
+            return new DataTransferObject.ActionResult { Ok = true };
+        }
     }
 }

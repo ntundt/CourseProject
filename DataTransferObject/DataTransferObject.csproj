@@ -50,11 +50,13 @@
     <Compile Include="DataTransferObject\ErrorInfo.cs" />
     <Compile Include="DataTransferObject\GetStartTestResult.cs" />
     <Compile Include="DataTransferObject\GetTestsResult.cs" />
+    <Compile Include="DataTransferObject\GetUserInfo.cs" />
     <Compile Include="DataTransferObject\PostQuestionResult.cs" />
     <Compile Include="DataTransferObject\PostTestResult.cs" />
     <Compile Include="DataTransferObject\PostUserAuth.cs" />
     <Compile Include="DataTransferObject\PutAnswer.cs" />
     <Compile Include="DataTransferObject\PutQuestion.cs" />
+    <Compile Include="DataTransferObject\PutUserInfo.cs" />
     <Compile Include="DataTransferObject\QuestionEnums.cs" />
     <Compile Include="DataTransferObject\QuestionInfo.cs" />
     <Compile Include="DataTransferObject\ResultInfo.cs" />

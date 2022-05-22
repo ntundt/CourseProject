@@ -3,7 +3,7 @@ using CourseProjectServer.Extension;
 using System.Data.SqlClient;
 using System.Data;
 using CourseProjectServer.Exceptions;
-
+using DataTransferObject;
 
 namespace CourseProjectServer.Repositories
 {
@@ -267,5 +267,174 @@ namespace CourseProjectServer.Repositories
             };
         }
 
+        public List<Result> GetResults(Test test)
+        {
+            var queryString =
+                $"SELECT " +
+                $"  ONGOING_TEST.ID ONGOING_TEST_ID, " +
+                $"  ONGOING_TEST.TEST_ID, " +
+                $"  ONGOING_TEST.RESPONDENT_USER_ID, " +
+                $"  ONGOING_TEST.STARTED, " +
+                $"  ONGOING_TEST.ENDED, " +
+
+                $"  TEST.ID TEST_ID, " +
+                $"  TEST.DATE_CREATED, " +
+                $"  TEST.RESULTS_PUBLIC, " +
+                $"  TEST.CAN_NOT_REVIEW_QUESTION, " +
+                $"  TEST.ATTEMPTS, " +
+                $"  TEST.TIME_LIMIT, " +
+                $"  TEST.PUBLIC_UNTIL, " +
+                $"  TEST.PRIVATE_UNTIL, " +
+
+                $"  \"USER\".ID USER_ID, " +
+                $"  \"USER\".NAME, " +
+                $"  \"USER\".DATE_CREATED, " +
+                $"  \"USER\".LOGIN, " +
+                $"  \"USER\".PASSWORD_SHA256, " +
+
+                $"  QUESTION.ID QUESTION_ID, " +
+                $"  QUESTION.QUESTION_INDEX, " +
+                $"  QUESTION.QUESTION, " +
+                $"  QUESTION.TYPE, " +
+                $"  QUESTION.CHECK_ALGORITHM, " +
+
+                $"  ANSWER_OPTION.ID ANSWER_OPTION_ID, " +
+                $"  ANSWER_OPTION.ANSWER ANSWER_OPTION_ANSWER, " +
+                $"  ANSWER_OPTION.CORRECT, " +
+
+                $"  USER_ANSWER.ID USER_ANSWER_ID, " +
+                $"  USER_ANSWER.ONGOING_TEST_ID, " +
+                $"  USER_ANSWER.ANSWER_ID, " +
+                $"  USER_ANSWER.QUESTION_ID, " +
+                $"  USER_ANSWER.ANSWER USER_ANSWER_ANSWER " +
+
+                $"FROM " +
+                $"  ONGOING_TEST " +
+                $"  JOIN TEST ON ONGOING_TEST.TEST_ID = TEST.ID " +
+                $"  JOIN \"USER\" ON ONGOING_TEST.RESPONDENT_USER_ID = \"USER\".ID " +
+                $"  LEFT JOIN QUESTION ON ONGOING_TEST.TEST_ID = QUESTION.TEST_ID " +
+                $"  full outer JOIN ANSWER_OPTION ON QUESTION.ID = ANSWER_OPTION.QUESTION_ID " +
+                $"  full outer JOIN USER_ANSWER ON " +
+
+                $"    USER_ANSWER.ONGOING_TEST_ID = ONGOING_TEST.ID " +
+
+                $"    AND( " +
+                $"        USER_ANSWER.QUESTION_ID = QUESTION.ID OR USER_ANSWER.ANSWER_ID = ANSWER_OPTION.ID " +
+                $"        ) " +
+                $"WHERE " +
+                $"  ONGOING_TEST.TEST_ID = @test_id " +
+                $"ORDER BY " +
+                $"  ONGOING_TEST.ID, " +
+                $"  QUESTION.QUESTION_INDEX, " +
+                $"  USER_ANSWER.ID";
+
+
+            using SqlConnection connection = new(_config.GetConnectionString("MsSql"));
+            connection.Open();
+            SqlCommand command = new(queryString, connection);
+
+            SqlParameter test_id = new("@test_id", SqlDbType.Int);
+            test_id.Value = test.TestId;
+            command.Parameters.Add(test_id);
+
+            command.Prepare();
+            SqlDataReader reader = command.ExecuteReader();
+
+            List<Result> results = new();
+            List<TestAttempt> testAttempts = new();
+            List<CorrectAnswer> correctAnswers = new();
+            List<User> respondents = new();
+            while (reader.Read())
+            {
+                User respondent;
+                try
+                {
+                    respondent = respondents.First(r => r.UserId == reader.GetFieldValue<int>("USER_ID"));
+                }
+                catch (InvalidOperationException)
+                {
+                    respondent = new User
+                    {
+                        UserId = reader.GetFieldValue<int>("USER_ID"),
+                        Name = reader.GetFieldValue<string>("NAME"),
+                        CreatedDate = reader.GetFieldValue<DateTime>("DATE_CREATED"),
+                        Login = reader.GetFieldValue<string?>("LOGIN"),
+                        PasswordHash = reader.GetFieldValue<string?>("PASSWORD_SHA256")
+                    };
+                    respondents.Add(respondent);
+                }
+
+                Result result;
+                try
+                {
+                    result = results.First(r => r.Attempt.AttemptId == reader.GetFieldValue<int>("ONGOING_TEST_ID"));
+                }
+                catch (InvalidOperationException)
+                {
+                    result = new Result
+                    {
+                        Attempt = new TestAttempt
+                        {
+                            AttemptId = reader.GetFieldValue<int>("ONGOING_TEST_ID"),
+                            Test = test,
+                            Testee = respondent,
+                            Started = reader.GetFieldValue<DateTime>("STARTED"),
+                            Ended = reader.GetFieldValue<DateTime>("ENDED")
+                        }
+                    };
+                    results.Add(result);
+                    testAttempts.Add(result.Attempt);
+                }
+
+                CorrectAnswer correctAnswer;
+                try
+                {
+                    correctAnswer = result.Answers.First(c => c.QuestionId == reader.GetFieldValue<int>("QUESTION_ID"));
+                }
+                catch (InvalidOperationException)
+                {
+                    correctAnswer = new CorrectAnswer
+                    {
+                        QuestionId = reader.GetFieldValue<int>("QUESTION_ID"),
+                        Index = reader.GetFieldValue<int>("QUESTION_INDEX"),
+                        Text = reader.GetFieldValue<string>("QUESTION"),
+                        QuestionType = reader.GetFieldValue<QuestionType>("TYPE"),
+                        CheckAlgorithm = reader.GetFieldValue<CheckAlgorithm>("CHECK_ALGORITHM"),
+                        Options = new()
+                    };
+                    correctAnswers.Add(correctAnswer);
+                    result.Answers.Add(correctAnswer);
+                }
+
+                CorrectAnswerOption option;
+                try
+                {
+                    option = correctAnswer.Options.First(o => o.AnswerId == reader.GetFieldValue<int>("ANSWER_OPTION_ID"));
+                }
+                catch (InvalidOperationException)
+                {
+                    option = new CorrectAnswerOption
+                    {
+                        AnswerId = reader.GetFieldValue<int>("ANSWER_OPTION_ID"),
+                        Text = reader.GetFieldValue<string>("ANSWER_OPTION_ANSWER"),
+                        IsActuallyCorrect = reader.GetFieldValue<bool>("CORRECT"),
+                    };
+                    correctAnswer.Options.Add(option);
+                }
+
+                option.Checked =
+                    (
+                        !reader.IsDBNull("ANSWER_OPTION_ID")
+                        && reader.GetFieldValue<int>("ANSWER_OPTION_ID") == reader.GetFieldValue<int>("ANSWER_ID")
+                    )
+                    ||
+                    (
+                        !reader.IsDBNull("USER_ANSWER_ANSWER")
+                        && reader.GetFieldValue<string>("USER_ANSWER_ANSWER").ToLower().Equals(reader.GetFieldValue<string>("ANSWER_OPTION_ANSWER").ToLower())
+                    );
+            }
+
+            return results;
+        }
     }
 }

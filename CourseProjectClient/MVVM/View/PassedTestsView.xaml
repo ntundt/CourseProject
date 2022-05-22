@@ -8,6 +8,7 @@
              xmlns:viewmodel="clr-namespace:CourseProjectClient.MVVM.ViewModel"
              xmlns:uc="clr-namespace:CourseProjectClient.MVVM.UserContols"
              mc:Ignorable="d" 
+             x:Name="rt"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
@@ -127,7 +128,8 @@
                                 <wpfui:Button 
                                     Grid.Column="1" Grid.Row="0"
                                     Height="35"
-                                    Command="{Binding SeeResults}"
+                                    Command="{Binding DataContext.SeeResults, ElementName=rt}"
+                                    CommandParameter="{Binding Id}"
                                     Content="Результаты"/>
 
                             </Grid>

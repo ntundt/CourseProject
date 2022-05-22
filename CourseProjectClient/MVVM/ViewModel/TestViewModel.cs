@@ -137,6 +137,7 @@ namespace CourseProjectClient.MVVM.ViewModel
                 try
                 {
                     Task.Run(async () => await CommunicationService.EndTest(_attempt.Id));
+                    NavigationMediator.SetRootViewModel(new TestListViewModel());
                 }
                 catch (AggregateException e) when (e.InnerException is DefaultException)
                 {

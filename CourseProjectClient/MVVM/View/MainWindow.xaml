@@ -57,6 +57,15 @@
                         DataContext="{Binding DataContext.CurrentViewModel, ElementName=RootWindow}"
                         Source="../View/TestEditor.xaml"/>-->
                 </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:UserSettingsViewModel}">
+                    <local:UserSettings DataContext="{Binding DataContext.CurrentViewModel, ElementName=RootWindow}"/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:AttemptResultViewModel}">
+                    <local:AttemptResultView DataContext="{Binding DataContext.CurrentViewModel, ElementName=RootWindow}"/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewmodel:ResultListViewModel}">
+                    <local:ResultListView DataContext="{Binding DataContext.CurrentViewModel, ElementName=RootWindow}" />
+                </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>
 

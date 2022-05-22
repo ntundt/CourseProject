@@ -4,7 +4,6 @@
     {
         public TestAttempt Attempt { get; set; } = new();
         public double Mark { get; set; }
-        public double MaxMark { get; set; }
         public List<CorrectAnswer> Answers { get; set; } = new();
     }
 }

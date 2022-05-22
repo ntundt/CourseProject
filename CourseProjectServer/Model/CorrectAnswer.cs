@@ -5,6 +5,7 @@ namespace CourseProjectServer.Model
     public class CorrectAnswer
     {
         public int QuestionId { get; set; }
+        public int Index { get; set; }
         public string Text { get; set; } = "";
         public QuestionType QuestionType { get; set; }
         public CheckAlgorithm CheckAlgorithm { get; set; }

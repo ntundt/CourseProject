@@ -4,6 +4,7 @@ namespace DataTransferObject {
     public class ResultInfo {
         public int AttemptId { get; set; }
         public int UserId { get; set; }
+        public string UserName { get; set; }
         public int TestId { get; set; }
         public double Mark { get; set; }
         public double MaxMark { get; set; }

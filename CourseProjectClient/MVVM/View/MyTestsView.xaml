@@ -8,6 +8,7 @@
              xmlns:viewmodel="clr-namespace:CourseProjectClient.MVVM.ViewModel"
              xmlns:uc="clr-namespace:CourseProjectClient.MVVM.UserContols"
              mc:Ignorable="d" 
+             x:Name="rt"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.DataContext>
@@ -29,7 +30,7 @@
             BorderThickness="0"
             Padding="0"
             Background="Transparent"
-            ItemsSource="{Binding PassedTests}">
+            ItemsSource="{Binding MyTests}">
 
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem">
@@ -48,7 +49,7 @@
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel 
+                    <StackPanel 
                         x:Name="stackPanel"
                         HorizontalAlignment="Center" />
                 </ItemsPanelTemplate>
@@ -56,10 +57,84 @@
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <uc:TestCard 
+                    <wpfui:Card 
+                        Margin="5"
+                        MinHeight="100"
+                        MinWidth="500">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition MinHeight="35"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel
+                                Orientation="Horizontal">
+                                <Label 
+                                    FontSize="18"
+                                    Content="Тест " />
+                                <TextBlock 
+                                    Grid.Column="0" 
+                                    Grid.Row="0"
+                                    FontSize="18"
+                                    Foreground="AntiqueWhite"
+                                    Text="{Binding Id}"
+                                    x:Name="Title"/>
+                            </StackPanel>
+
+                            <Grid Grid.Column="0" Grid.Row="1">
+
+                                <Grid.Resources>
+                                    <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+                                </Grid.Resources>
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!--<StackPanel
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center">
+
+                                    <wpfui:SymbolIcon
+                                        Visibility="{Binding QuestionCountLabelVisible, Converter={StaticResource BoolToVis}}"
+                                        Symbol="CheckboxChecked20"/>
+
+                                    <Label
+                                        Margin="0,3,7,0"
+                                        Foreground="AntiqueWhite"
+                                        x:Name="QuestionCountLabel"
+                                        VerticalAlignment="Center"
+                                        Visibility="{Binding QuestionCountLabelVisible, Converter={StaticResource BoolToVis}}"
+                                        Content="{Binding QuestionCountFormatted}"/>
+
+                                    <wpfui:SymbolIcon 
+                                        Visibility="{Binding TimeLimitLabelVisible, Converter={StaticResource BoolToVis}}"
+                                        Symbol="Clock20"/>
+
+                                    <Label
+                                        Margin="1,3,7,0"
+                                        Foreground="AntiqueWhite"
+                                        x:Name="TimeLimitLabel"
+                                        Visibility="{Binding TimeLimitLabelVisible, Converter={StaticResource BoolToVis}}"
+                                        Content="{Binding TimeLimitFormatted}"/>
+
+                                </StackPanel>-->
+
+                                <wpfui:Button 
+                                    Grid.Column="1" Grid.Row="0"
+                                    Height="35"
+                                    Command="{Binding DataContext.ViewResults, ElementName=rt}"
+                                    CommandParameter="{Binding Id}"
+                                    Content="Результаты"/>
+
+                            </Grid>
+                        </Grid>
+                    </wpfui:Card>
+
+                    <!--<uc:TestCard 
                         Text="{Binding Id}"
-                        QuestionCount="{Binding Id}"
-                        TimeLimit="{Binding TimeLimit, Converter={StaticResource ltts}}"/>
+                        QuestionCount="{Binding Id}" />-->
                 </DataTemplate>
             </ListBox.ItemTemplate>
 
