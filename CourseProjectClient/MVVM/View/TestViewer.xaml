@@ -73,6 +73,7 @@
                                     Width="30"
                                     Margin="3,0,0,0"
                                     Content="{Binding Index}" 
+                                    MouseLeftButtonDown="Button_MouseLeftButtonDown"
                                     Cursor="Hand"/>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -105,19 +106,19 @@
                     
                     <ListView 
                         ItemsSource="{Binding SelectedQuestion.AnswerOptions}"
-                        Visibility="{Binding SelectedQuestion.QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static dto:QuestionType.SingleChoise}}">
+                        Visibility="{Binding SelectedQuestion.QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static dto:QuestionType.SingleChoice}}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <RadioButton GroupName="QuestionAnswers" IsChecked="{Binding SingleChoiseSelected}" Content="{Binding Text}"/>
+                                <RadioButton GroupName="QuestionAnswers" IsChecked="{Binding SingleChoiceSelected}" Content="{Binding Text}"/>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                     <ListView
                         ItemsSource="{Binding SelectedQuestion.AnswerOptions}"
-                        Visibility="{Binding SelectedQuestion.QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static dto:QuestionType.MultipleChoise}}">
+                        Visibility="{Binding SelectedQuestion.QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static dto:QuestionType.MultipleChoice}}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <CheckBox Margin="0,5,0,0" IsChecked="{Binding MultipleChoiseSelected}" Content="{Binding Text}"/>
+                                <CheckBox Margin="0,5,0,0" IsChecked="{Binding MultipleChoiceSelected}" Content="{Binding Text}"/>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>

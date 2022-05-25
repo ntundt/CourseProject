@@ -32,6 +32,8 @@ namespace CourseProjectServer.Controllers
                 testsInfo.Add(test.ToTestInfo());
             }
 
+            testsInfo.Reverse();
+
             return new GetTestsResult
             {
                 Tests = testsInfo

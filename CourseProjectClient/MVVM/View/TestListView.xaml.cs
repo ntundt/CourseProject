@@ -24,5 +24,10 @@ namespace CourseProjectClient.MVVM.View
         {
             InitializeComponent();
         }
+
+        private void StackPanel_OnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            ScrollView.ScrollToVerticalOffset(ScrollView.VerticalOffset - e.Delta);
+        }
     }
 }

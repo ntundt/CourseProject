@@ -26,13 +26,18 @@ namespace CourseProjectServer.Controllers
             User user = userDao.GetByAccessToken(Request.Headers.Authorization);
             List<TestAttempt> testAttempts = attemptDao.GetByUserId(user.UserId);
 
-            return testAttempts.Select(x => new AttemptInfo() {
+            var result = testAttempts.Select(x => new AttemptInfo()
+            {
                 AttemptId = x.AttemptId,
                 TestId = x.Test.TestId,
                 UserId = x.Testee.UserId,
                 Started = ((DateTimeOffset)x.Started).ToUnixTimeSeconds(),
-                Ended = ((DateTimeOffset)(x.Ended < new DateTime(1970, 1, 1) ? new DateTime(1970, 1, 1) : x.Ended)).ToUnixTimeSeconds()
+                Ended = ((DateTimeOffset)(x.Ended < new DateTime(1970, 1, 1) ? new DateTime(1970, 1, 1) : x.Ended))
+                    .ToUnixTimeSeconds()
             }).ToList();
+            result.Reverse();
+            
+            return result;
         }
 
         [Route("{testAttemptId}/end")]

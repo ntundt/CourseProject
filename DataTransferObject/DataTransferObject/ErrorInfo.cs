@@ -8,7 +8,9 @@ namespace DataTransferObject
 {
     public class ErrorInfo
     {
+        // Код ошибки
         public int Code { get; set; }
+        // Сообщение ошибки
         public string Message { get; set; }
     }
 }

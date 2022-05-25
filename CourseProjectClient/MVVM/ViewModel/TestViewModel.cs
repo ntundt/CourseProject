@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 using WPFUI.Common;
 
 namespace CourseProjectClient.MVVM.ViewModel
@@ -29,8 +30,27 @@ namespace CourseProjectClient.MVVM.ViewModel
             {
                 _attempt = value;
                 RetrieveQuestions();
-                PropertyChanged(this, new PropertyChangedEventArgs("Attempt"));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(Attempt)));
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(Questions)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(HasTimeLimit)));
+                if (HasTimeLimit)
+                {
+                    DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Normal);
+                    timer.Tick += delegate
+                    {
+                        if (_attempt.Ended.Value - DateTime.Now + new TimeSpan(3, 0, 0) 
+                            < new TimeSpan(0, 0, -1))
+                        {
+                            var result = new AttemptResultViewModel();
+                            result.SetAttemptId(_attempt.Id);
+                            NavigationMediator.SetRootViewModel(result);
+                            timer.Stop();
+                        }
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(TimeLeft)));
+                    };
+                    timer.Interval = new TimeSpan(0, 0, 1);
+                    timer.Start();
+                }
             } 
         }
 
@@ -41,7 +61,7 @@ namespace CourseProjectClient.MVVM.ViewModel
             set
             {
                 _questions = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("Questions"));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(Questions)));
             }
         }
 
@@ -52,7 +72,11 @@ namespace CourseProjectClient.MVVM.ViewModel
             set
             {
                 _selectedQuestion = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("SelectedQuestion"));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(SelectedQuestion)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(RadioButtonsVisible)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(CheckboxesVisible)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(StringInputVisible)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(SelectedQuestion)));
             } 
         }
 
@@ -60,24 +84,24 @@ namespace CourseProjectClient.MVVM.ViewModel
         {
             get {
                 if (_attempt.Ended == null) return "";
-                TimeSpan timeLeft = _attempt.Ended.Value - DateTime.Now;
-                return $"{timeLeft.TotalHours}:{timeLeft.TotalMinutes}:{timeLeft.TotalSeconds}";
+                TimeSpan timeLeft = _attempt.Ended.Value - DateTime.Now + new TimeSpan(3, 0, 0);
+                return $"{timeLeft.Hours}:{timeLeft.Minutes.ToString().PadLeft(2, '0')}:{timeLeft.Seconds.ToString().PadLeft(2, '0')}";
             }
         }
 
         public bool HasTimeLimit
         {
-            get => _attempt.Ended <= _attempt.Started;
+            get => _attempt.Ended > _attempt.Started;
         }
 
         public bool RadioButtonsVisible
         {
-            get => _selectedQuestion.QuestionType == QuestionType.SingleChoise;
+            get => _selectedQuestion.QuestionType == QuestionType.SingleChoice;
         }
 
         public bool CheckboxesVisible
         {
-            get => _selectedQuestion.QuestionType == QuestionType.MultipleChoise;
+            get => _selectedQuestion.QuestionType == QuestionType.MultipleChoice;
         }
 
         public bool StringInputVisible
@@ -124,12 +148,19 @@ namespace CourseProjectClient.MVVM.ViewModel
             {
                 try
                 {
-                    Task.Run(async () => await CommunicationService.SaveAnswer(_attempt.Id, SelectedQuestion));
+                    var _question = SelectedQuestion;
+                    Task.Run(async () => await CommunicationService.SaveAnswer(_attempt.Id, _question));
+                    SelectedQuestion.Unsaved = false;
+                    int index = Questions.IndexOf(SelectedQuestion) + 1;
+                    SelectedQuestion = Questions.Count > index ? Questions[index] : SelectedQuestion;
                 }
                 catch (AggregateException e) when (e.InnerException is DefaultException)
                 {
                     (e.InnerException as DefaultException).ShowSnackBar();
                 }
+            }, () =>
+            {
+                return SelectedQuestion.Unsaved;
             });
 
             EndAttempt = new RelayCommand(() =>

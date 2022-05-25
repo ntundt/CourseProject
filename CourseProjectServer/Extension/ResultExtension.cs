@@ -42,66 +42,74 @@ namespace CourseProjectServer.Extension
             result.Mark = 0;
 
             foreach (var answer in result.Answers)
-            {
-                foreach (var option in answer.Options)
+            {   
+                int correctOptionCount = answer.Options.Count(x => x.IsActuallyCorrect);
+
+                foreach (var option in answer.Options) 
                 {
-                    if (option.IsActuallyCorrect) 
-                    {
-                        answer.MaxMark += 1;
-                    }
-                }
-            }
-
-            foreach (var answer in result.Answers)
-            {
-                bool questionFailed = false;
-
-                foreach (var option in answer.Options) {
-                    if (answer.QuestionType == QuestionType.SingleChoise)
+                    if (answer.QuestionType == QuestionType.SingleChoice)
                     {
                         if (option.Checked && option.IsActuallyCorrect)
                         {
-                            result.Mark += 1 / answer.MaxMark;
-                            answer.Mark += 1 / answer.MaxMark;
-                        }
-                    }
-                    else if (answer.QuestionType == QuestionType.MultipleChoise)
-                    {
-                        if (option.Checked && option.IsActuallyCorrect)
+                            answer.Mark = 1;
+                        } 
+                        else if (option.Checked && !option.IsActuallyCorrect)
                         {
-                            result.Mark += 1 / answer.MaxMark;
-                            answer.Mark += 1 / answer.MaxMark;
-                        }
-                        else if (option.Checked && !option.IsActuallyCorrect && answer.CheckAlgorithm == CheckAlgorithm.Percentage)
-                        {
-                            result.Mark += 1 / answer.MaxMark;
-                            answer.Mark += 1 / answer.MaxMark;
-                        }
-                        else if (option.Checked && !option.IsActuallyCorrect && answer.CheckAlgorithm == CheckAlgorithm.FullMatch)
-                        {
-                            questionFailed = true;
+                            answer.Mark = 0;
                             break;
+                        }
+                    }
+                    else if (answer.QuestionType == QuestionType.MultipleChoice)
+                    {
+                        if (answer.CheckAlgorithm == CheckAlgorithm.FullMatch)
+                        {
+                            answer.Mark = 1;
+                            if (option.IsActuallyCorrect && !option.Checked || !option.IsActuallyCorrect && option.Checked)
+                            {
+                                answer.Mark = 0;
+                                break;
+                            }
+                        }
+                        else if (answer.CheckAlgorithm == CheckAlgorithm.PartialMatch)
+                        {
+                            if (option.Checked && option.IsActuallyCorrect)
+                            {
+                                answer.Mark += 1f / correctOptionCount;
+                            }
+                        }
+                        else if (answer.CheckAlgorithm == CheckAlgorithm.Percentage)
+                        {
+                            if (option.IsActuallyCorrect && option.Checked)
+                            {
+                                answer.Mark += 1f / correctOptionCount;
+                            }
+                            else if (!option.IsActuallyCorrect && option.Checked)
+                            {
+                                answer.Mark -= 1f / (answer.Options.Count - correctOptionCount);
+                            }
                         }
                     }
                     else if (answer.QuestionType == QuestionType.StringInput)
                     {
                         if (option.Checked && option.IsActuallyCorrect)
                         {
-                            result.Mark += 1 / answer.MaxMark;
-                            answer.Mark += 1 / answer.MaxMark;
+                            answer.Mark = 1;
                         }
                     }
                 }
 
-                answer.MaxMark = 1;
-
-                if (questionFailed)
+                if (answer.Mark < 0)
                 {
-                    result.Mark -= answer.Mark;
                     answer.Mark = 0;
                 }
-            }
 
+                answer.MaxMark = 1;
+                result.MaxMark += 1;
+                result.Mark += answer.Mark;
+                answer.Mark = Math.Round(answer.Mark, 2);
+            }
+            result.Mark = Math.Round(result.Mark, 2);
+            result.MaxMark = result.Answers.Count;
         }
     }
 }

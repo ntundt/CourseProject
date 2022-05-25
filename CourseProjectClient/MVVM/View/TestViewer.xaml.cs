@@ -32,5 +32,12 @@ namespace CourseProjectClient.MVVM.View
         {
             sidebar.ScrollToVerticalOffset(sidebar.VerticalOffset - e.Delta);
         }
+
+        private void Button_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var testViewModel = (DataContext as TestViewModel);
+            testViewModel.SelectedQuestion = testViewModel.Questions.First(
+                x => x.Index == Convert.ToInt32(((sender as Border).Child as TextBlock).Text));
+        }
     }
 }

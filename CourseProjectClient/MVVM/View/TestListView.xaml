@@ -90,6 +90,7 @@
 
             <ScrollViewer 
                 MaxWidth="{Binding ActualWidth, ElementName=MainContent}"
+                MouseWheel="StackPanel_OnMouseWheel"
                 x:Name="ScrollView"
                 Grid.Column="1">
 

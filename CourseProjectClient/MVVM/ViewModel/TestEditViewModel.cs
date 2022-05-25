@@ -18,6 +18,60 @@ namespace CourseProjectClient.MVVM.ViewModel
 {
     internal class TestEditViewModel : INotifyPropertyChanged, IDropTarget
     {
+        public void DragOver(IDropInfo dropInfo) {
+            Question question = dropInfo.TargetItem as Question;
+
+            if (question != null)
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
+                dropInfo.Effects = DragDropEffects.Move;
+            }
+        }
+
+        public void Drop(IDropInfo dropInfo) 
+        {
+            Question source = dropInfo.Data as Question;
+            int oldIndex = Questions.IndexOf(source);
+
+            // Если место, куда хотим вставить отличается от места, где вопрос был раньше
+            if (oldIndex != dropInfo.InsertIndex && oldIndex + 1 != dropInfo.InsertIndex)
+            {
+                try
+                {
+                    // Сохранить изменение индекса вопроса на сервере
+                    Task.Run(async () => await CommunicationService.SaveQuestion(Test.Id, source.Id, new PutQuestion
+                    {
+                        Index = oldIndex < dropInfo.InsertIndex ? dropInfo.InsertIndex : dropInfo.InsertIndex + 1
+                    }));
+
+                    // Обновить локальный список
+                    SelectedQuestion = Questions.FirstOrDefault(x => x.Id != source.Id);
+
+                    Questions.Remove(source);
+                    try
+                    {
+                        Questions.Insert(oldIndex < dropInfo.InsertIndex ? dropInfo.InsertIndex - 1 : dropInfo.InsertIndex, source);
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        Questions.Add(source);
+                    }
+
+                    SelectedQuestion = source;
+
+                    UpdateQuestionIndexes();
+                }
+                catch (AggregateException e) when (e.InnerException is DefaultException)
+                {
+                    // Если сервер вернул ошибку в ответ на запрос на изменение индекса вопроса, сообщить пользователю о ней
+                    (e.InnerException as DefaultException).ShowSnackBar();
+                }
+            }
+        }
+        public void DragLeave(IDropInfo dropInfo) { }
+        public void DragEnter(IDropInfo dropInfo) { }
+
+
         public ICommand AddAnswerOptionCommand { get; set; }
         public ICommand CreateQuestionCommand { get; set; }
         public ICommand DeleteQuestionCommand { get; set; }
@@ -54,54 +108,6 @@ namespace CourseProjectClient.MVVM.ViewModel
             SelectedQuestion = _questions.First(x => x.Index == index);
         }
 
-        public void DragEnter(IDropInfo dropInfo) { }
-
-        public void DragOver(IDropInfo dropInfo) {
-            Question question = dropInfo.TargetItem as Question;
-
-            if (question != null)
-            {
-                dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
-                dropInfo.Effects = DragDropEffects.Move;
-            }
-        }
-
-        public void DragLeave(IDropInfo dropInfo) { }
-
-        public void Drop(IDropInfo dropInfo) 
-        {
-            Question source = dropInfo.Data as Question;
-            int oldIndex = Questions.IndexOf(source);
-            if (oldIndex != dropInfo.InsertIndex)
-            {
-                SelectedQuestion = Questions.FirstOrDefault(x => x.Id != source.Id);
-
-                Questions.Remove(source);
-                try
-                {
-                    Questions.Insert(oldIndex < dropInfo.InsertIndex ? dropInfo.InsertIndex - 1: dropInfo.InsertIndex, source);
-                } catch (ArgumentOutOfRangeException)
-                {
-                    Questions.Add(source);
-                }
-
-                SelectedQuestion = source;
-
-                UpdateQuestionIndexes();
-
-                try
-                {
-                    Task.Run(async () => await CommunicationService.SaveQuestion(Test.Id, SelectedQuestion.Id, new PutQuestion
-                    {
-                        Index = SelectedQuestion.Index
-                    }));
-                }
-                catch (AggregateException e) when (e.InnerException is DefaultException)
-                {
-                    (e.InnerException as DefaultException).ShowSnackBar();
-                }
-            }
-        }
 
         private bool _hasTimeLimit;
         public bool HasTimeLimit
@@ -151,7 +157,9 @@ namespace CourseProjectClient.MVVM.ViewModel
             int index = 1;
             foreach (Question question in _questions)
             {
+                bool temp = question.Unsaved;
                 question.Index = index++;
+                question.Unsaved = temp;
             }
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(Questions)));
         }
@@ -186,6 +194,29 @@ namespace CourseProjectClient.MVVM.ViewModel
         }
 
         private string _answerOptionConstructed;
+        
+        private bool _hasAttemptLimit;
+        public bool HasAttemptLimit
+        {
+            get => _hasAttemptLimit;
+            set
+            {
+                _hasAttemptLimit = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(HasAttemptLimit)));
+            }
+        }
+
+        private int _attemptLimit;
+        public int AttemptLimit
+        {
+            get => _attemptLimit;
+            set
+            {
+                _attemptLimit = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(HasAttemptLimit)));
+            }
+        }
+
         public string AnswerOptionConstructed
         {
             get => _answerOptionConstructed;
@@ -232,12 +263,12 @@ namespace CourseProjectClient.MVVM.ViewModel
 
         public bool RadioButtonsVisible
         {
-            get => _selectedQuestion.QuestionType == QuestionType.SingleChoise;
+            get => _selectedQuestion.QuestionType == QuestionType.SingleChoice;
         }
 
         public bool CheckboxesVisible
         {
-            get => _selectedQuestion.QuestionType == QuestionType.MultipleChoise;
+            get => _selectedQuestion.QuestionType == QuestionType.MultipleChoice;
         }
 
         public bool StringInputVisible
@@ -247,8 +278,8 @@ namespace CourseProjectClient.MVVM.ViewModel
 
         public bool AddAnswerVisible
         {
-            get => _selectedQuestion.QuestionType == QuestionType.MultipleChoise
-                || _selectedQuestion.QuestionType == QuestionType.SingleChoise;
+            get => _selectedQuestion.QuestionType == QuestionType.MultipleChoice
+                || _selectedQuestion.QuestionType == QuestionType.SingleChoice;
         }
 
         public void SetTestId(int id) {
@@ -340,7 +371,7 @@ namespace CourseProjectClient.MVVM.ViewModel
                     new DefaultException(0, "Для вопроса не указан ответ").ShowSnackBar();
                     return false;
                 }
-                if (question.AnswerOptions.Count > 0 && question.AnswerOptions.Any(x=> !x.IsChecked))
+                if (question.AnswerOptions.Count > 0 && !question.AnswerOptions.Any(x=> x.SingleChoiceSelected || x.MultipleChoiceSelected))
                 {
                     SelectedQuestion = question;
                     new DefaultException(0, "Для вопроса не указан правильный ответ").ShowSnackBar();
@@ -357,7 +388,7 @@ namespace CourseProjectClient.MVVM.ViewModel
                 Id = 1,
                 Text = "what is obamas last name",
                 Index = 1,
-                QuestionType = QuestionType.MultipleChoise,
+                QuestionType = QuestionType.MultipleChoice,
                 AnswerOptions = new ObservableCollection<AnswerOption>()
                 {
                     new AnswerOption()
@@ -384,7 +415,7 @@ namespace CourseProjectClient.MVVM.ViewModel
             {
                 SelectedQuestion.AnswerOptions.Add(new AnswerOption { 
                     Text = AnswerOptionConstructed,
-                    SingleChoiseSelected = !SelectedQuestion.AnswerOptions.Any(x => x.SingleChoiseSelected)
+                    SingleChoiceSelected = !SelectedQuestion.AnswerOptions.Any(x => x.SingleChoiceSelected)
                 });
                 AnswerOptionConstructed = "";
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(AnswerOptions)));
@@ -428,18 +459,18 @@ namespace CourseProjectClient.MVVM.ViewModel
                     QuestionType = (int)_selectedQuestion.QuestionType,
                     CheckAlgorithm = (int)_selectedQuestion.CheckAlgorithm,
                     Text = _selectedQuestion.Text,
-                    AnswerOptions = _selectedQuestion.QuestionType == QuestionType.SingleChoise ? 
+                    AnswerOptions = _selectedQuestion.QuestionType == QuestionType.SingleChoice ? 
                         _selectedQuestion.AnswerOptions.Select(x => new PutAnswerOption
                         {
                             Text = x.Text,
-                            Checked = x.SingleChoiseSelected
+                            Checked = x.SingleChoiceSelected
                         }).ToList()
                         : 
-                        _selectedQuestion.QuestionType == QuestionType.MultipleChoise ?
+                        _selectedQuestion.QuestionType == QuestionType.MultipleChoice ?
                             _selectedQuestion.AnswerOptions.Select(x => new PutAnswerOption
                             {
                                 Text = x.Text,
-                                Checked = x.MultipleChoiseSelected
+                                Checked = x.MultipleChoiceSelected
                             }).ToList()
                             :
                             new List<PutAnswerOption>()
@@ -470,7 +501,8 @@ namespace CourseProjectClient.MVVM.ViewModel
                     {
                         Task.Run<TestInfo>(async () => await CommunicationService.PutTest(this._test.Id, new TestInfoSetter
                         {
-                            TimeLimit = _hasTimeLimit ? _timeLimit * 60 : 0
+                            TimeLimit = _hasTimeLimit ? _timeLimit * 60 : 0,
+                            Attempts = _hasAttemptLimit ? (int?)_attemptLimit : null
                         }));
                         NavigationMediator.SetRootViewModel(new TestListViewModel());
                     }

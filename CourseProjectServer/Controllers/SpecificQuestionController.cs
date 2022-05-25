@@ -16,7 +16,7 @@ namespace CourseProjectServer.Controllers
         private readonly TestDao testDao;
         private readonly UserDao userDao;
         public SpecificQuestionController(IConfiguration config)
-        {
+        {   
             questionDao = new(config);
             testDao = new(config);
             userDao = new(config);

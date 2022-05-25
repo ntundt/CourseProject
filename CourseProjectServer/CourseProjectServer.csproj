@@ -7,16 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="DataProvider\PutQuestionProvider.cs" />
-    <Compile Remove="DataProvider\PutQuestionProviderFactory.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="DataProvider\PutQuestionProvider.cs" />
-    <None Include="DataProvider\PutQuestionProviderFactory.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
   </ItemGroup>
 

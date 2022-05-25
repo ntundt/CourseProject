@@ -48,31 +48,7 @@ namespace CourseProjectClient.MVVM.Model
             }
         }
 
-        private int? _mark;
-        public int? Mark 
-        {
-            get => _mark;
-            set
-            {
-                _mark = value;
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(Mark)));
-                Unsaved = true;
-            }
-        }
-
-        private int? _maxMark;
-        public int? MaxMark 
-        { 
-            get => _maxMark; 
-            set
-            {
-                _maxMark = value;
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(MaxMark)));
-                Unsaved = true;
-            } 
-        }
-
-        private QuestionType _questionType = QuestionType.SingleChoise;
+        private QuestionType _questionType = QuestionType.SingleChoice;
         public QuestionType QuestionType 
         { 
             get => _questionType; 
@@ -178,17 +154,6 @@ namespace CourseProjectClient.MVVM.Model
             }
         }
 
-        private bool _isCorrect;
-        public bool IsCorrect 
-        { 
-            get => _isCorrect;
-            set
-            {
-                _isCorrect = value;
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(IsCorrect)));
-            }
-        }
-
         private bool _isChecked;
         public bool IsChecked 
         { 
@@ -200,26 +165,26 @@ namespace CourseProjectClient.MVVM.Model
             }
         }
 
-        private bool _multipleChoiseSelected;
-        public bool MultipleChoiseSelected
+        private bool _multipleChoiceSelected;
+        public bool MultipleChoiceSelected
         {
-            get => _multipleChoiseSelected;
+            get => _multipleChoiceSelected;
             set
             {
-                _multipleChoiseSelected = value;
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(MultipleChoiseSelected)));
+                _multipleChoiceSelected = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(MultipleChoiceSelected)));
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(IsChecked)));
             }
         }
 
-        private bool _singleChoiseSelected;
-        public bool SingleChoiseSelected
+        private bool _singleChoiceSelected;
+        public bool SingleChoiceSelected
         {
-            get => _singleChoiseSelected;
+            get => _singleChoiceSelected;
             set
             {
-                _singleChoiseSelected = value;
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(SingleChoiseSelected)));
+                _singleChoiceSelected = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(SingleChoiceSelected)));
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(IsChecked)));
             }
         }

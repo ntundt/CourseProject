@@ -2,8 +2,8 @@
 {
     public enum QuestionType
     {
-        SingleChoise,
-        MultipleChoise,
+        SingleChoice,
+        MultipleChoice,
         StringInput
     }
 

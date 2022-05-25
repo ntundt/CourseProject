@@ -39,7 +39,7 @@
                         Orientation="Horizontal">
                         <Label 
                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Margin="5,5,10,0"
+                            Margin="5,5,5,0"
                             FontSize="18"
                             Content="Тест"/>
                         <Label
@@ -48,6 +48,17 @@
                             FontSize="18"
                             Content="{Binding Test.Id}"/>
                     </StackPanel>
+                    
+                    <CheckBox
+                        IsChecked="{Binding HasAttemptLimit}"
+                        Margin="5,5,5,0"
+                        Content="Ограничение попыток"/>
+                    <wpfui:NumberBox 
+                        IsEnabled="{Binding HasAttemptLimit}"
+                        Text="{Binding AttemptLimit}"
+                        Margin="5,5,5,0"
+                        Placeholder="Количество попыток"/>
+                    
                     <CheckBox
                         IsChecked="{Binding HasTimeLimit}"
                         Margin="5,5,5,0"
@@ -57,6 +68,7 @@
                         Text="{Binding TimeLimit}"
                         Margin="5,5,5,0"
                         Placeholder="Минуты"/>
+                    
                     <TextBlock
                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Margin="5,5,5,0"
@@ -67,7 +79,7 @@
                         Icon="Add12"
                         Appearance="Secondary"
                         Content="Добавить"
-                        Command="{Binding CreateQuestionCommand}"/>
+                        Command="{Binding CreateQuestionCommand}" Cursor="Hand"/>
 
                     <ListBox 
                         BorderBrush="Transparent"
@@ -152,7 +164,7 @@
                         Visibility="{Binding RadioButtonsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <RadioButton Margin="0,5,0,0" GroupName="QuestionAnswers" IsChecked="{Binding SingleChoiseSelected}" Content="{Binding Text}"/>
+                                <RadioButton Margin="0,5,0,0" GroupName="QuestionAnswers" IsChecked="{Binding SingleChoiceSelected}" Content="{Binding Text}"/>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
@@ -161,7 +173,7 @@
                         Visibility="{Binding CheckboxesVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <CheckBox Margin="0,5,0,0" IsChecked="{Binding MultipleChoiseSelected}" Content="{Binding Text}"/>
+                                <CheckBox Margin="0,5,0,0" IsChecked="{Binding MultipleChoiceSelected}" Content="{Binding Text}"/>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
@@ -213,11 +225,11 @@
                 <RadioButton
                     GroupName="QuestionType"
                     Content="Одиночный выбор"
-                    IsChecked="{Binding QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static dto:QuestionType.SingleChoise}}"/>
+                    IsChecked="{Binding QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static dto:QuestionType.SingleChoice}}"/>
                 <RadioButton
                     GroupName="QuestionType"
                     Content="Множественный выбор"
-                    IsChecked="{Binding QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static dto:QuestionType.MultipleChoise}}"/>
+                    IsChecked="{Binding QuestionType, Converter={StaticResource ComparisonConverter}, ConverterParameter={x:Static dto:QuestionType.MultipleChoice}}"/>
                 <RadioButton
                     GroupName="QuestionType"
                     Content="Ввод строки"

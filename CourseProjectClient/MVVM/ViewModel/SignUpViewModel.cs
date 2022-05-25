@@ -18,9 +18,6 @@ namespace CourseProjectClient.MVVM.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public ICommand SignUpCommand { get; set; }
-        public ICommand GoToLogIn { get; set; }
-
         private string _name;
         public string Name
         {
@@ -31,6 +28,9 @@ namespace CourseProjectClient.MVVM.ViewModel
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(Name)));
             }
         }
+
+        public ICommand SignUpCommand { get; set; }
+        public ICommand GoToLogIn { get; set; }
 
         public SignUpViewModel()
         {

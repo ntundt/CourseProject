@@ -66,7 +66,7 @@ namespace CourseProjectServer.Controllers
             {
                 throw new CanNotAccessPrivateTestException(testId);
             }
-            if (attemptDao.GetUsedAttemptCount(user.UserId, testId) > test.Attempts)
+            if (test.Attempts != 0 && attemptDao.GetUsedAttemptCount(testId, user.UserId) > test.Attempts)
             {
                 throw new TooManyAttemptsException(testId, test.Attempts);
             }

@@ -22,13 +22,15 @@ namespace CourseProjectClient.Services
                 var serverResponse = await client.GetAsync(_baseAddress + $"auth?login={login}&password={password}");
                 string response = await serverResponse.Content.ReadAsStringAsync();
 
-                AuthResult result = JsonConvert.DeserializeObject<AuthResult>(response);
-                if (result == null)
+                if (serverResponse.IsSuccessStatusCode) {
+                    AuthResult result = JsonConvert.DeserializeObject<AuthResult>(response);
+                    return result;
+                } 
+                else
                 {
                     ErrorInfo error = JsonConvert.DeserializeObject<ErrorInfo>(response);
                     throw new DefaultException(error.Code, error.Message);
                 }
-                return result;
             }
         }
 
@@ -212,17 +214,17 @@ namespace CourseProjectClient.Services
             {
                 PutAnswer answer;
 
-                if (question.QuestionType == QuestionType.SingleChoise)
+                if (question.QuestionType == QuestionType.SingleChoice)
                 {
                     answer = new PutAnswer
                     {
-                        SelectedOption = question.AnswerOptions.First(x => x.SingleChoiseSelected).Id
+                        SelectedOption = question.AnswerOptions.First(x => x.SingleChoiceSelected).Id
                     };
-                } else if (question.QuestionType == QuestionType.MultipleChoise)
+                } else if (question.QuestionType == QuestionType.MultipleChoice)
                 {
                     answer = new PutAnswer
                     {
-                        SelectedOptions = question.AnswerOptions.Where(x => x.MultipleChoiseSelected).Select(x => x.Id).ToList().ToArray()
+                        SelectedOptions = question.AnswerOptions.Where(x => x.MultipleChoiceSelected).Select(x => x.Id).ToArray()
                     };
                 } else
                 {

@@ -24,7 +24,13 @@ namespace CourseProjectServer.Controllers
         private static bool CheckPassword(string password, string passwordHash)
         {
             using SHA256 sha = SHA256.Create();
-            return passwordHash.Equals(sha.ComputeHash(Encoding.ASCII.GetBytes(password + "salt")));
+            var hash = sha.ComputeHash(Encoding.ASCII.GetBytes(password + "salt"));
+            var hashString = new StringBuilder();
+            foreach (byte x in hash)
+            {
+                hashString.Append(x.ToString("x2"));
+            }
+            return hashString.ToString() == passwordHash;
         }
 
         [HttpGet]

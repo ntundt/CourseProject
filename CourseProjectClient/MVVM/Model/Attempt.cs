@@ -42,10 +42,29 @@ namespace CourseProjectClient.MVVM.Model
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(UserId)));
             }
         }
-        public int? Mark { get; set; }
-        public int? MaxMark { get; set; }
-        public DateTime Started { get; set; }
-        public DateTime? Ended { get; set; }
+
+        private DateTime _started;
+        public DateTime Started
+        {
+            get => _started;
+            set
+            {
+                _started = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(Started)));
+            }
+        }
+
+
+        private DateTime? _ended;
+        public DateTime? Ended
+        {
+            get => _ended;
+            set
+            {
+                _ended = value;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(Ended)));
+            }
+        }
 
         public bool HasEnded
         {

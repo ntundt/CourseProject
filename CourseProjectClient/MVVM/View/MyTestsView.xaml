@@ -50,7 +50,7 @@
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel 
-                        x:Name="stackPanel"
+                        x:Name="StackPanel"
                         HorizontalAlignment="Center" />
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>

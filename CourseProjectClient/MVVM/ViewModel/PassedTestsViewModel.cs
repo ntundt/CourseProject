@@ -96,7 +96,7 @@ namespace CourseProjectClient.MVVM.ViewModel
                         UserId = AuthenticationProvider.GetInstance().UserId,
                         TestId = Convert.ToInt32(_testId),
                         Started = DateTimeOffset.FromUnixTimeSeconds(result.Started).DateTime,
-                        Ended = DateTimeOffset.FromUnixTimeSeconds(result.Started + (result.Limit ?? 0)).DateTime
+                        Ended = DateTimeOffset.FromUnixTimeSeconds(result.Limit ?? 0).DateTime
                     };
                     model.Attempt = attempt;
                     NavigationMediator.SetRootViewModel(model);

@@ -61,7 +61,7 @@ namespace CourseProjectServer.Middleware
                         await response.WriteAsync(JsonSerializer.Serialize(new ErrorInfo
                         {
                             Code = 302,
-                            Message = "Test with given id not found"
+                            Message = "Access token is invalid"
                         }));
                         break;
 
@@ -123,7 +123,7 @@ namespace CourseProjectServer.Middleware
                         response.StatusCode = (int)HttpStatusCode.BadRequest;
                         await response.WriteAsync(JsonSerializer.Serialize(new ErrorInfo
                         {
-                            Code = 302,
+                            Code = 303,
                             Message = "User does not have password, can not log in"
                         }));
                         break;

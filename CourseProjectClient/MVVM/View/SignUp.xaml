@@ -42,7 +42,7 @@
                     <wpfui:Button
                         Grid.Column="2"
                         Appearance="Success"
-                        Content="Войти"
+                        Content="Регистрация"
                         Command="{Binding SignUpCommand}"/>
                 </Grid>
             </StackPanel>
